@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+        body {background: #F8F8F8;}
+        #topItem{padding:10px 2%;background:#fff;margin-top:10px;}
+        .aui-bar-btn-item.aui-active{background:none;color:#56B3F6;border-bottom:#56B3F6 1px solid;}
+        .aui-bar-btn-item{border:0px;color:#333;border-bottom:1px solid #E5E5E5;}
+        .qus-box{padding:10px 30px;background:#fff;font-size:15px;color:#333;position:relative;margin-bottom:10px;padding-top:20px;}
+        .qus-box .input{margin-top:5px;font-size:15px;color:#333;}
+        .cont-item{display:none;}
+        .cont-item-act{display:block;}
+        .aui-list-item-input .input{font-size:15px;}
+        .btn{display:block; background:#56B3F6;border:0px;height:45px;border-radius:30px;width:80%;text-align:center;line-height:45px;margin:0 auto; color:#fff;font-size:15px;margin-top:20px;}
+      </style>
+  </head>
+  <body>
+    <div class="aui-content aui-margin-b-15">
+        <div class="qus-box">
+            <span id="qus1"></span>
+            <input id='answer1' type="text" class="input" placeholder="请输入答案">
+            <span id="qus2"></span>
+            <input id='answer2' type="text" class="input" placeholder="请输入答案">
+            <span id="qus3"></span>
+            <input id='answer3' type="text" class="input" placeholder="请输入答案">
+          </div>
+          <div id="loginpasss" class="cont-item cont-item-act">
+            <ul class="aui-list aui-form-list">
+              <li class="aui-list-item">
+                       <div class="aui-list-item-inner">
+                          <div class="aui-list-item-input">
+                               <input id='password' type="password" class="input" value='' placeholder="请输入新的登录密码">
+                           </div>
+                       </div>
+                   </li>
+                   <li class="aui-list-item">
+                       <div class="aui-list-item-inner">
+                            <div class="aui-list-item-input">
+                               <input id='rpassword' type="password" class="input" value='' placeholder="请再次输入新的登录密码">
+                           </div>
+                       </div>
+                   </li>
+             </ul>
+              <button id="btndenglu" class="btn" tapmode onclick="fntijiao();">提交修改</button>
+          </div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/aui-tab.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+    apiready = function(){
+      api.parseTapmode();
+      fnDataList();
+    };
+    function fntijiao() {
+      var btn='';
+      var ans1 =$api.byId('answer1').value;
+      var ans2 =$api.byId('answer2').value;
+      var ans3 =$api.byId('answer3').value;
+      var pass='';
+      var rpass='';
+      btn = document.getElementById("btndenglu");
+      pass=$api.byId('password').value;
+      rpass=$api.byId('rpassword').value;
+
+      if(isNull(ans1)){
+        mytoast("请输入问题1的答案","middle");
+        return false;
+      }
+      if(isNull(ans2)){
+        mytoast("请输入问题2的答案","middle");
+        return false;
+      }
+      if(isNull(ans3)){
+        mytoast("请输入问题3的答案","middle");
+        return false;
+      }
+      if(isNull(pass)){
+        mytoast("请输入新的密码","middle");
+        return false;
+      }
+      if(pass!=rpass){
+        mytoast("两次密码不一致","middle");
+        return false;
+      }
+      var hyid = $api.getStorage('hyid');
+      var token =$api.getStorage('accessToken');
+      if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+        btn.disabled=true;
+        btn.innerText="正在提交，请稍候..."
+        api.parseTapmode();
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '正在提交...',
+            text: '请稍候...',
+            modal: true
+        });
+        getAjax('/editmima',{uid: hyid, answer1: ans1, answer2: ans2, answer3: ans3, pwd: pass,type:1 },function(res){
+             if (res.code==0) {
+              btn.disabled = false;
+              btn.innerText = "提交";
+              api.hideProgress();
+              mytoast(res.msg,"middle")
+              $api.clearStorage();
+                //广播退出
+                api.sendEvent({
+                    name: 'outlogin'
+                });
+              api.closeWin({
+                  name: 'uppass'
+              });
+             }else if(res.code==2){
+               api.alert({
+                   title: ' ',
+                   msg: '账号在别处登录,您已被迫下线！',
+               }, function(ret, err){
+                 $api.clearStorage();
+                   api.openWin({
+                       name: 'login',
+                       url: 'login.html',
+                       pageParam: {}
+                   });
+                   api.hideProgress();
+               });
+             }else{
+               api.hideProgress();
+               mytoast(res.msg,"middle")
+             }
+        })
+      }
+    }
+    //加载数据
+    function fnDataList(){
+      var hyid = $api.getStorage('hyid');
+      var token =$api.getStorage('accessToken');
+      if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '正在加载...',
+            text: '请稍候...',
+            modal: true
+          });
+          getAjax('/pwdwenti',{uid: hyid,token: token},function(res){
+            if (res.code == "0") {
+                $api.html($api.byId('qus1'),res.data[0]);
+                $api.html($api.byId('qus2'),res.data[1]);
+                $api.html($api.byId('qus3'),res.data[2]);
+                api.hideProgress();
+              }else if (res.code == 2) {
+                api.alert({
+                    title: ' ',
+                    msg: '账号在别处登录,您已被迫下线！',
+                }, function(ret, err){
+                  $api.clearStorage();
+                  //广播退出
+                  api.sendEvent({
+                      name: 'outlogin'
+                  });
+                    api.openWin({
+                        name: 'login',
+                        url: 'login.html',
+                        pageParam: {}
+                    });
+                    api.hideProgress();
+                });
+              } else {
+                api.hideProgress();
+                mytoast(res.msg,"middle")
+              }
+          })
+      }else{
+        api.alert({
+            title: ' ',
+            msg: '账号在别处登录,您已被迫下线！',
+        }, function(ret, err){
+          $api.clearStorage();
+          //广播退出
+          api.sendEvent({
+              name: 'outlogin'
+          });
+            api.openWin({
+                name: 'login',
+                url: 'login.html',
+                pageParam: {}
+            });
+            api.hideProgress();
+        });
+      }
+    }
+  </script>
+  </html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+      body{background: #fff;}
+        .item{
+          margin-top:10px;
+          width:28%;
+          margin-left:4%;
+          padding:20px 0px;
+          border-radius:10px;
+          border:1px solid #E8E8E8;
+          text-align:center;
+          font-size:15px;
+          color:#636363;
+          float:left;
+      }
+      .clear{clear: both;overflow: hidden;}
+      .act{border:1px solid #1FB6FB;background:#EAF5FA;}
+      .item .t{font-size:18px;display:block;}
+      .item .price{color:#FFBF00;margin-top:5px;display:block;}
+      .item i{font-weight:normal;font-style:initial;font-size:20px;}
+      .btn{display:none; background:#56B3F6;border:0px;height:45px;border-radius:30px;width:80%;text-align:center;line-height:45px;margin:0 auto; color:#fff;font-size:15px;margin-top:20px;}
+      .show{display: block;}
+      </style>
+  </head>
+  <body>
+    <div class="aui-content aui-margin-b-15">
+        <div style="font-size:18px;color:#333;margin:20px;">充值套餐</div>
+        <div class="list">
+          <div class="item" :class="{act:index==ins}" v-for="(item,index) of listData" :key="index" tapmode :data-id="item.ID" onclick="vm.act()">
+              <span class="t">{{item.SP_NAME}}</span>
+              <span class="price">￥<i>{{item.SP_PRICE}}</i></span>
+          </div>
+      </div><div class="clear"></div>
+      <div id="btngoumai" class="btn" tapmode onclick="goumai()">立即购买</div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+  var datas={
+      listData:'',
+      ins: 0,
+      tcid: 0,
+  }
+
+  var vm=new Vue({
+    el: '.aui-content',
+    data: datas,
+    methods:{
+      act:function(){
+        var target = $api.closest(event.target, '.item');
+        var d=$api.attr(target, 'data-id')
+        datas.tcid=d;
+        datas.ins=d-1;
+        this.$nextTick(function(){
+            api.parseTapmode();
+        })
+      }
+    },updated:function(){
+      api.parseTapmode();
+    }
+  })
+ var headerHeight;
+  apiready = function(){
+    headerHeight=$api.getStorage("headerHeight");
+    api.parseTapmode();
+    fnDataList();
+  };
+  function goumai(){
+    api.actionSheet({
+    cancelTitle: '取消',
+    buttons: ['支付宝支付', '微信支付']
+    }, function(ret, err) {
+      var index = ret.buttonIndex;
+      if(index!=3){
+        buy(index)
+      }
+    });
+  }
+
+  function buy(index){
+    var zftype="alipay";
+    var tcid=datas.tcid;
+    var yuming=siteAdd;
+     if(index==1){
+       zftype="alipay"
+     }else if(index==2){
+       zftype="wechat"
+     }
+     var hyid = $api.getStorage('hyid');
+     var token =$api.getStorage('accessToken');
+     if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+       api.showProgress({
+           style: 'default',
+           animationType: 'fade',
+           title: '努力加载中...',
+           text: '请稍候...',
+           modal: false
+       });
+       getAjax('/pay',{ uid: hyid, token: token, type: zftype, tid:tcid,domain:yuming,f:1},function(res){
+         if (res.code==0) {
+           api.hideProgress();
+          }else if(res.code==2){
+          api.alert({
+              title: ' ',
+              msg: '账号在别处登录,您已被迫下线！',
+          }, function(ret, err){
+            $api.clearStorage();
+            //广播退出
+            api.sendEvent({
+                name: 'outlogin'
+            });
+              api.openWin({
+                  name: 'login',
+                  url: 'login.html',
+                  pageParam: {}
+              });
+              api.hideProgress();
+            });
+          }else if(res.code==4){
+             api.openFrame({
+                name: 'pay',
+                url: res.data,
+                bounces: true,
+                vScrollBarEnabled: false,
+                hScrollBarEnabled: false,
+                bgColor: 'rgba(0,0,0,0)',
+                rect: {
+                    x: 0,
+                    y: headerHeight,
+                    w: 'auto',
+                    h: api.frameHeight
+                }
+            });
+          }
+          else{
+            api.hideProgress();
+            mytoast(res.msg,"middle")
+          }
+       })
+     }
+  }
+
+  function fnDataList(){
+    api.showProgress({
+        style: 'default',
+        animationType: 'fade',
+        title: '加载中...',
+        text: ' ',
+        modal: false
+      });
+      getAjax('/taocan',{},function(res){
+          if (res.code==0) {
+            api.hideProgress();
+            datas.listData = res.data;
+            datas.tcid = res.data[0].ID;
+            $api.addCls($api.byId("btngoumai"), 'show');
+
+            api.parseTapmode();
+          }else{
+            api.hideProgress();
+            mytoast(res.msg,"middle")
+          }
+      })
+  }
+  </script>
+  </html>

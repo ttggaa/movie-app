@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <style>
+
+          .clear{clear: both;overflow:hidden;}
+          .bottom{height: 60px;line-height: 60px;background: #000;color:#0f0;font-size: 18px;position: fixed;bottom:0px;width:100%;left:0px;}
+          .bottom .btns{float:left;width:50%;text-align: center;font-size: 18px;padding:0px;margin:0px;}
+      </style>
+  </head>
+  <body>
+      <div class="bottom">
+        <div class="btns" tapmode onclick="fnClose()">取消</div>
+        <div class="btns" tapmode onclick="fnSave()">保存</div>
+        <div class="clear"></div>
+      </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript">
+    var FNImageClip;
+      apiready = function(){
+        api.parseTapmode();
+        FNImageClip = api.require('FNImageClip');
+        fnopen();
+      };
+
+        function fnopen(){
+          var imgsrc=$api.getStorage("headimg");
+          FNImageClip.open({
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth,
+                h: api.winHeight - document.querySelector('.bottom').offsetHeight
+            },
+            srcPath:imgsrc,
+            highDefinition: true,
+            style: {
+                mask: 'rgba(0,0,0,0.5)',//（可选项）字符串类型；图片裁剪控件遮罩层背景，支持 rgb，rgba，#；默认：#888
+                clip: {
+                        w: 180,//（可选项）数字类型；裁剪区域的宽度，当 appearance 为 circular 时，w 为半径；默认：rect.w / 2
+                        h: 180,//（可选项）数字类型；裁剪区域的高度，当 appearance 为 circular 时，h 无效；默认：w
+                        x: api.winWidth / 2-90,//（可选项）数字类型；裁剪区域左侧相对于裁剪控件左侧的距离；默认：(rect.w - w) / 2
+                        y: api.winHeight/2-90,//（可选项）数字类型；裁剪区域顶部相对于裁剪控件顶部的距离；默认：(rect.h - h) / 2
+                        borderColor: '#0f0',//（可选项）字符串类型；裁剪区域边线颜色，支持 rgb，rgba，#；默认：透明
+                        borderWidth:1,//（可选项）数字类型；裁剪区域边线；默认：0
+                        appearance: 'rectangle'//（可选项）字符串类型；裁剪区域的形状，支持 circular | rectangle；默认：rectangle
+                      }
+                  },
+            mode: "image",
+            fixedOn: api.frameName//（可选项）模块视图添加到指定 frame 的名字（只指 frame，传 window 无效）
+           }, function(ret, err) {
+              if (ret) {
+                //console.log(JSON.stringify(ret));
+              } else {
+                //  alert(JSON.stringify(err));
+              }
+          });
+        }
+
+     function fnClose(){
+        FNImageClip.close();
+        api.closeWin({
+            name: 'cutimg'
+        });
+
+    }
+
+    function fnSave(){
+      FNImageClip.save({
+          destPath: 'fs://image/temp'+new Date().getTime()+'.png',
+          quality: 1
+      },function(ret, err){
+          if(ret) {
+              //alert(JSON.stringify(ret));
+            var imgSrc=ret.destPath;
+            fnUpheadImg(imgSrc);
+          } else{
+            mytoast("裁剪失败，请重试","middle");
+              //alert(JSON.stringify(err));
+          }
+      });
+    }
+
+    function fnUpheadImg(src){
+      var hyid = $api.getStorage('hyid');
+      var token =$api.getStorage('accessToken');
+      if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+         api.showProgress({
+             style: 'default',
+             animationType: 'fade',
+             title: '正在提交...',
+             text: '请稍候...',
+             modal: true
+         });
+         var url=apiurl;
+         api.ajax({
+             url: url+'/appupload',
+             method: 'post',
+             data: {
+                 values: {
+                     uid:hyid,
+                     token:token
+                 },files:{
+                   pic:src
+                 }
+             }
+         },function(ret, err){
+           api.hideProgress();
+           var res=JSON.parse(JSON.stringify(ret));
+           if (res.code==0) {
+              mytoast(res.msg,"middle")
+                api.sendEvent({
+                    name: 'setuserinfo'
+                });
+                api.closeWin();
+             }else if(res.code==2){
+
+               api.alert({
+                   title: ' ',
+                   msg: '账号在别处登录,您已被迫下线！',
+               }, function(ret, err){
+                 $api.clearStorage();
+                 //广播退出
+                 api.sendEvent({
+                     name: 'outlogin'
+                 });
+                   api.openWin({
+                       name: 'login',
+                       url: 'login.html',
+                       pageParam: {}
+                   });
+               });
+             }else {
+              mytoast(res.msg,"middle")
+             }
+         });
+       }
+    }
+  </script>
+  </html>

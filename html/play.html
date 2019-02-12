@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+          body{
+
+          }
+          .aui-bar-nav .aui-title{width:100%;right:0px;left:0px;padding-left:30px;}
+          .tshow{color:#fff;background-color:#ff6a00;font-size:13px;width:100%;}
+          .thide{color:#fff;font-size:13px;width:100%;}
+    </style>
+  </head>
+  <body>
+    <header id="header" class="aui-bar aui-bar-nav">
+      <a class="aui-pull-left event-back">
+        <span class="aui-iconfont aui-icon-left"></span>
+      </a>
+      <div id="tips" class="aui-title"></div>
+    </header>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript">
+      apiready = function(){
+        var pageParam=api.pageParam.spid;
+        fnReady();
+        fnReadyFrame();
+      };
+      function shikantxt(i){
+        if(i==0){
+            $api.text($api.byId('tips'), '此为试看地址,如需观看完整内容请充值!');
+        }else {
+            $api.text($api.byId('tips'), '此为试看地址,如需观看完整内容请登录!');
+        }
+      }
+      function showTips(){
+        var title=$api.getStorage('playtitle');
+        //console.log(title);
+        var t= $api.byId('tips');
+        $api.removeCls(t, 'thide');
+        $api.addCls(t, 'tshow');
+        $api.text($api.byId('tips'),title);
+      }
+      function hideTips(){
+        var title=$api.getStorage('playtitle');
+        //console.log(title);
+        var t= $api.byId('tips');
+        $api.removeCls(t, 'tshow');
+        $api.addCls(t, 'thide');
+        $api.text($api.byId('tips'),"正在播放："+title);
+      }
+  </script>
+  </html>

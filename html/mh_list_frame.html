@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui-slide.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/iconfont.css" />
+      <style>
+          body{
+            background:#fff;
+          }
+          .aui-slide-wrap{height:200px;}
+          .aui-slide-node img {
+              width: 100%;
+              height: 100%;
+            }
+.manhua-info-box{margin:10px 3%;color:#A0A0A0;font-size:15px;position:relative;}
+ .manhua-info-box .v-title{font-size:18px;color:#000;}
+ .manhua-info-box .v-type{
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: flex;
+   justify-content:space-between;
+   -webkit-box-pack:justify;
+   -moz-justify-content:space-between;
+   -webkit-justify-content: space-between;
+   margin-top:5px;
+ }
+.manhua-info-box .v-summary{margin-top:5px;height:40px;overflow:hidden;}
+.sum-btn{width:100%;color:#333;font-size:15px;text-align:center;padding:5px;}
+.zhankai{display:block;}
+.shouqi{display:none;}
+.share-box{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  justify-content:space-between;
+  -webkit-box-pack:justify;
+  -moz-justify-content:space-between;
+  -webkit-justify-content: space-between;
+  align-items:center;
+  -webkit-align-items:center;
+  box-align:center;
+  -moz-box-align:center;
+  -webkit-box-align:center;
+  margin:10px 3%;
+  margin-top:15px;
+  padding-bottom:5px;
+  border-bottom:1px solid #EFEFEF;
+}
+ .share-box .iconfont{
+   font-size:22px;
+ }
+ .share-box .s_cm{
+     font-size:15px;
+     display: -webkit-box;
+     display: -webkit-flex;
+     display: flex;
+     align-items:center;
+     -webkit-align-items:center;
+     box-align:center;
+     -moz-box-align:center;
+     -webkit-box-align:center;
+     color:#03A9F4;
+  }
+ .share-box .s_share{
+   color:#414141
+ }
+
+ .zhangjie{
+   margin:10px 3%;
+ }
+ .zhangjie .title{
+   font-size:16px;
+   color:#333;
+ }
+ .zhangjie .zj-item{
+   margin-top:5px;
+ }
+ .zhangjie .zj-item {
+   width:100%;
+   height:30px;
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: flex;
+   justify-content:space-between;
+   -webkit-box-pack:justify;
+   -moz-justify-content:space-between;
+   -webkit-justify-content: space-between;
+   align-items:center;
+   -webkit-align-items:center;
+   box-align:center;
+   -moz-box-align:center;
+   -webkit-box-align:center;
+ }
+ .zhangjie .zj-item .name{width:70%;font-size:15px;color:#333; overflow: hidden; /*自动隐藏文字*/text-overflow: ellipsis;/*文字隐藏后添加省略号*/white-space: nowrap;/*强制不换行*/}
+ .zhangjie .zj-item .qx{font-size:15px;color:#71C0F7;}
+ .zhangjie .zj-item .qxv{font-size:15px;color:#FED032;}
+      </style>
+  </head>
+  <body>
+    <div class="aui-content aui-margin-b-15">
+      <div id="aui-slide-mhxq">
+       <div class="aui-slide-wrap" >
+           <div class="aui-slide-node" v-for="(item,index) of mhbanner" :key="index">
+               <img :src="item" />
+           </div>
+       </div>
+       <div class="aui-slide-page-wrap"><!--分页容器--></div>
+      </div>
+      <div class="manhua-info-box">
+          <div class="v-title">{{manhuaInfo.CT_NAME}}</div>
+          <div class="v-type"><div>{{manhuaInfo.CT_CATEGORY}}</div><div>简介</div></div>
+          <div id="v-summary" class="v-summary">{{manhuaInfo.CT_CONTENT}}</div>
+          <div id="zhankai" class="sum-btn zhankai" tapmode onclick="fnzhankai()">展开全文</div>
+          <div id="shouqi" class="sum-btn shouqi" tapmode onclick="fnshouqi()">收起</div>
+      </div>
+        <div class="share-box">
+            <div class="s_cm" tapmode onclick="fnpl()"><div class="iconfont icon-yuanfucengpinglun"></div>{{comment}}热评</div>
+            <div class="s_share"><span class="iconfont icon-shoucang" v-if="isShoucang==0" tapmode onclick="fnshoucang()"></span><span class="iconfont icon-wodeshoucang" v-else style="color:#FFD00E;"></span><span class="iconfont icon-fenxiang2" style="margin-left:10px;" tapmode onclick="fnfenxiang()"></span></div>
+        </div>
+        <div class="zhangjie">
+            <div class="title">章节列表</div>
+            <div class="list">
+                <div class="zj-item" v-for="(item,index) of listData" :key="index" :data-id="item.ID" tapmode onclick="fnshow()">
+                  <div class="name">{{item.CTD_TITLE}}</div>
+                  <div class="qx" v-if="item.CTD_TYPE==1">免费章节</div>
+                  <div class="qxv" v-else>VIP章节</div>
+               </div>
+            </div>
+        </div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript" src="../script/aui-slide.js"></script>
+  <script type="text/javascript">
+    var datas={
+          mh_id: 0,//漫画ID
+          isShoucang:0,//是否收藏
+          comment: 0,//评论总数
+          manhuaInfo: '',//漫画信息
+          siteUrl: "",//站点地址
+          mhbanner:[],
+          listData:'',
+          pagesize:10,
+          pageindex:0
+    }
+  var mhlist=new Vue({
+      el: '.aui-content',
+      data: datas,
+      updated:function(){
+         api.parseTapmode();
+         var slidemhxq = new auiSlide({
+           container:document.getElementById("aui-slide-mhxq"),
+           "height":200,
+           "speed":500,
+           "autoPlay": 3000, //自动播放
+           "loop":true,
+           "pageShow":true,
+           "pageStyle":'dot',
+           'dotPosition':'right'
+         })
+      }
+    })
+    apiready = function(){
+      api.parseTapmode();
+      datas.mh_id=api.pageParam.mhid;//获取ID
+      datas.siteUrl=siteAdd;
+      scrolltobottom();//上拉加载更多
+      fnDataList();
+    };
+
+    function fnshow(){
+      var mhids=datas.mh_id;
+      var target = $api.closest(event.target, '.zj-item');
+      var id=$api.attr(target, 'data-id');
+       api.openWin({
+           name: 'manhua_show',
+           url: 'manhua_show.html',
+           pageParam: {
+               mhid:mhids,
+               zjid:id
+           }
+       });
+
+    }
+    //展开更多简介
+    function fnzhankai(){
+      $api.css($api.byId("zhankai"),'display:none');
+      $api.css($api.byId("shouqi"),'display:block');
+      $api.css($api.byId("v-summary"),'height:100px;overflow:scroll');
+    }
+    //收起更多简介
+    function fnshouqi(){
+      $api.css($api.byId("zhankai"),'display:block');
+      $api.css($api.byId("shouqi"),'display:none');
+      $api.css($api.byId("v-summary"),'height:40px;overflow:hidden');
+    }
+    //评论
+    function fnpl(){
+      var id=datas.mh_id;
+      api.openWin({
+          name: 'mhpl',
+          url: 'mhpl.html',
+          pageParam: {
+              mhid:id
+          }
+      });
+    }
+    function fnfenxiang(){
+      var clipBoard = api.require('clipBoard');
+       var hyid = $api.getStorage('hyid');
+       var url=datas.siteUrl+"manhua_list.html?id="+datas.mh_id
+       if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+         url=datas.siteUrl+"manhua_list.html?id="+datas.mh_id+"&pid="+hyid;
+       }
+        api.actionSheet({
+            buttons: ['复制链接']
+        }, function(ret, err){
+            if( ret ){
+               if(ret.buttonIndex==1){
+                 clipBoard.set({
+                     value:url
+                 }, function(ret, err) {
+                     if (ret) {
+                       mytoast("复制成功","middle");
+                     }
+                 });
+               }
+            }
+        });
+    }
+    //收藏
+    function fnshoucang(){
+      mytoast("正在操作","middle");
+      var mhid=datas.mh_id;
+      var hyid = $api.getStorage('hyid');
+      var token =$api.getStorage('accessToken');
+      if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+        if ( typeof(mhid) != undefined && typeof(mhid) != 'undefined' && mhid != null) {
+           getAjax('/shoucang',{uid:hyid,token:token,id:mhid,type:2},function(res){
+             if(res.code==0){
+               datas.isShoucang=res.data.shoucang;
+               mytoast(res.msg,"middle");
+             }else if(res.code==2){
+               api.alert({
+                   title: ' ',
+                   msg: '账号在别处登录,您已被迫下线！',
+               }, function(ret, err){
+                 $api.clearStorage();
+                 //广播退出
+                 api.sendEvent({
+                     name: 'outlogin'
+                 })
+               })
+             }else {
+                mytoast(res.msg,"middle");
+             }
+           })
+        }else {
+          mytoast("未获取到漫画ID","middle");
+        }
+      }else {
+        mytoast("您还未登录！","middle");
+      }
+    }
+
+    function fnDataList(){
+      var mhid=datas.mh_id;
+      if ( typeof(mhid) != undefined && typeof(mhid) != 'undefined' && mhid != null) {
+        var hyid = $api.getStorage('hyid');
+        var token =$api.getStorage('accessToken');
+        if (typeof(hyid) == undefined && typeof(hyid) == 'undefined' && hyid == null) {
+          hyid = 0;
+          token = 0;
+        }
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中...',
+            text: '',
+            modal: true
+        });
+
+        var pgsize=datas.pagesize;
+        var pgidx=0;
+        datas.pageindex=0;
+        //加载详情
+        getAjax('/cartoondec',{id:mhid, uid: hyid, token: token},function(res){
+           if(res.code==0){
+              //加载章节
+              getAjax('/cardetial',{id: mhid,pagesize:pgsize,pageindex:pgidx},function(r){
+                if(r.code==0){
+                  datas.isShoucang = res.data.shoucang;
+                  datas.mhbanner=res.data.cartoon.CT_PHOTO_URL;
+                  datas.manhuaInfo = res.data.cartoon;
+                  datas.comment = res.data.comment;//获取评论数量
+                  datas.listData=r.data;
+                  api.hideProgress();
+                }else {
+                  api.hideProgress();
+                  mytoast(res.msg,"middle");
+                }
+              })
+           }else {
+             api.hideProgress();
+             mytoast(res.msg,"middle");
+           }
+         })
+      }else {
+        mytoast("获取漫画信息出错!","middle");
+        setTimeout(function(){
+          api.closeWin();
+        },1500)
+      }
+    }
+
+    //上拉加载更多
+    function scrolltobottom() {
+      api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+              threshold: 50 //距离底部距离
+          }
+      }, function(ret, err) {
+          getmore();
+      });
+  }
+  function getmore(){
+    var pgsize =datas.pagesize;
+    var pgidx =datas.pageindex + 1;//当前页
+    var mhid=datas.mh_id;
+      datas.pageindex = pgidx;
+      if (typeof(mhid) != undefined && typeof(mhid) != 'undefined' && mhid != null) {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中...',
+            text: '',
+            modal: false
+          });
+          getAjax('/cardetial',{id: mhid,pagesize:pgsize,pageindex:pgidx},function(res){
+            if (res.code==0) {
+              if(res.data.length>0){
+                 var data = datas.listData;
+                    data = data.concat(res.data)
+                    datas.listData = data;
+                   api.hideProgress();
+              }else{
+                api.hideProgress();
+                mytoast("没有更多章节了","middle");
+              }
+           }else{
+             api.hideProgress();
+             mytoast(res.msg,"middle")
+           }
+        })
+      }
+  }
+  </script>
+  </html>

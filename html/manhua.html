@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui-slide.css"/>
+      <style>
+          body{
+            background:#f8f8f8;
+          }
+          .aui-slide-node img {
+              width: 100%;
+              height: 100%;
+            }
+            .slide-title{color:#fff;position:absolute;bottom:0px;left:0px;width:100%;height:30px;line-height:30px;text-align:left;text-indent:12px;opacity:0.8;background-color:rgba(0,0,0,0.5);}
+
+          .list{
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: flex;
+                justify-content:space-between;
+                -webkit-box-pack:justify;
+                -moz-justify-content:space-between;
+                -webkit-justify-content: space-between;
+                -webkit-flex-wrap:wrap;
+    -webkit-box-lines:multiple;
+    -moz-flex-wrap:wrap;
+    flex-wrap:wrap;
+            }
+          .item{width:49%;margin-top:15px;overflow: hidden;}
+          .item .img{width:100%; height:125px;border-radius:0px;}
+          .item .bd{
+            margin-top:5px;
+            padding:0 10px;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            justify-content:space-between;
+            -webkit-box-pack:justify;
+            -moz-justify-content:space-between;
+            -webkit-justify-content: space-between;
+          }
+          .item .title{width:60%; color:#333;font-size: 14px;overflow: hidden; /*自动隐藏文字*/text-overflow: ellipsis;/*文字隐藏后添加省略号*/white-space: nowrap;/*强制不换行*/}
+          .item .guankan{padding:0px 5px;font-size: 12px;background:#56B3F6;border-radius:10px;color:#fff;}
+          .item .guankan a{color:#fff;}
+          .item .vip{background:#FED61A;}
+      </style>
+  </head>
+  <body>
+    <div class="aui-content aui-margin-b-15">
+      <div id="aui-slide-mh" v-if="isBanner">
+       <div class="aui-slide-wrap" id="banner">
+           <!--<div class="aui-slide-node" v-for="item in bannerData" :key="item.id" :data-id="item.BN_TYPE_ID" tapmode onclick="vm.fnbanner()">
+               <img :src="item.BN_URL" />
+           </div>-->
+       </div>
+       <div class="aui-slide-page-wrap"><!--分页容器--></div>
+     </div>
+       <div class="list" id="list">
+            <!-- <div class="item" v-for="(item,key) in listData" :key="item.ID" :data-id="item.ID"  tapmode onclick="vm.mhlist()">
+               <img :src="item.CT_PHOTO_URL" class="img"/>
+                <div class="bd"><span class="title">{{item.CT_NAME}}</span></div>
+             </div>-->
+       </div>
+        <div v-if="jlNum==0" style="text-align:center;margin-top:50px;font-size:15px;color:#666;">暂无内容！</div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript" src="../script/aui-slide.js"></script>
+  <script type="text/javascript">
+  var datas={
+        isBanner:true,
+        bannerData:[],
+        listData:[],
+        jlNum:1,
+        pagesize:10,
+        pageindex:0
+  }
+
+   var vm=new Vue({
+       el: '.aui-content',
+       data: datas,
+       methods:{
+         mhlist:function(){
+           var target = $api.closest(event.target, '.item');
+           var ids=$api.attr(target, 'data-id');
+           if(ids!=0){
+             api.openWin({
+                 name: 'mh_list',
+                 url: 'mh_list.html',
+                 pageParam: {
+                     mhid:ids
+                 }
+             });
+           }
+         },
+         fnbanner:function(){
+            var target = $api.closest(event.target, '.aui-slide-node');
+            var ids=$api.attr(target, 'data-id');
+            if(ids!=0){
+              api.openWin({
+                  name: 'mh_list',
+                  url: 'mh_list.html',
+                  pageParam: {
+                      mhid:ids
+                  }
+              });
+            }
+          }
+       }
+     })
+
+  apiready = function(){
+        api.parseTapmode();
+
+        fnListData();
+        initPullRefresh();
+        scrolltobottom();//上拉加载更多
+  };
+
+     function fnListData(){
+       var pgidx=0;
+       var pgs=datas.pagesize;
+       datas.pageindex = 0;//重置为0
+       api.showProgress({
+           style: 'default',
+           animationType: 'fade',
+           title: '加载中...',
+           text: ' ',
+           modal: true
+       });
+        getAjax('/jingcartoon',{pagesize:pgs,pageindex:pgidx},function(res){
+          if (res.code==0) {
+            api.refreshHeaderLoadDone();
+            getAjax('/banner',{type: 4},function(r){
+              if (r.code==0) {
+               if ( typeof(r.data) != undefined && typeof(r.data) != 'undefined' && r.data != null) {
+                 //datas.bannerData=r.data;
+                 var bhtml='';
+                 for(var b=0;b<r.data.length;b++){
+                   bhtml+='<div class="aui-slide-node" data-id="'+r.data[b].BN_TYPE_ID+'" tapmode onclick="vm.fnbanner()">'
+                        +'<img data-url="'+r.data[b].BN_URL+'" class="imgcache"/>'
+                        +'<p class="slide-title">'+r.data[b].BN_NAME+'</p>'
+                        +'</div>'
+                 }
+                 $api.html($api.byId('banner'),bhtml);
+                 var slidemh = new auiSlide({
+                   container:document.getElementById("aui-slide-mh"),
+                   "height":200,
+                   "speed":500,
+                   "autoPlay": 3000, //自动播放
+                   "loop":true,
+                   "pageShow":true,
+                   "pageStyle":'dot',
+                   "dotPosition":'right'
+                 })
+                 datas.isBanner=true;
+               }else {
+                 datas.isBanner=false;
+               }
+               //datas.listData=res.data;
+               if(res.data.length>0){
+                 var list_html='';
+                 for(var i=0;i<res.data.length;i++){
+                   list_html+='<div class="item" data-id="'+res.data[i].ID+'" tapmode onclick="vm.mhlist()">'
+                            +'<img data-url="'+res.data[i].CT_PHOTO_URL+'" class="img imgcache" />'
+                            +'<div class="bd"><span class="title">'+res.data[i].CT_NAME+'</span></div>'
+                            +'</div>'
+                 }
+                 $api.html($api.byId('list'),list_html);
+                 datas.jlNum=res.data.length;
+                 imagecache();//图片缓存
+               }else {
+                 datas.jlNum=0
+               }
+               api.hideProgress();
+              }else{
+                api.hideProgress();
+                mytoast(r.msg,"middle")
+              }
+            })
+          }else{
+            api.hideProgress();
+            mytoast(res.msg,"middle")
+          }
+        })
+      }
+      function imagecache(){
+        var srcs=$api.domAll(".imgcache");
+        if(srcs.length>0){
+          for(var i=0;i<srcs.length;i++){
+            (function(obj){
+              api.imageCache({
+                  url:$api.attr(obj,'data-url'),
+                  thumbnail:false
+              }, function(ret, err){
+                  if( ret ){
+                    $api.attr(obj, 'src', ret.url);
+                  }
+                api.hideProgress();
+              });
+
+            })(srcs[i])
+          }
+        }
+      }
+
+      function initPullRefresh() {
+        api.setRefreshHeaderInfo({
+            loadingImg: 'widget://image/refresh.png',
+            bgColor: '#ccc',
+            textColor: '#fff',
+            textDown: '下拉刷新...',
+            textUp: '松开刷新...'
+          }, function(ret, err) {
+              fnListData();
+          });
+        };
+  //上拉加载更多
+    function scrolltobottom() {
+          api.addEventListener({
+              name: 'scrolltobottom',
+              extra: {
+                  threshold: 50 //距离底部距离
+              }
+          }, function(ret, err) {
+              getmore();
+          });
+      }
+      function getmore(){
+        var pgsize =datas.pagesize;
+        var pgidx =datas.pageindex + 1;//当前页
+          datas.pageindex = pgidx;
+           api.showProgress({
+                style: 'default',
+                animationType: 'fade',
+                title: '加载中...',
+                text: '',
+                modal: false
+              });
+           getAjax('/jingcartoon',{pagesize: pgsize, pageindex: pgidx},function(res){
+                if (res.code==0) {
+                  if(res.data.length>0){
+                      var data = datas.listData;
+                      data = data.concat(res.data)
+                      datas.listData = data;
+                      api.hideProgress();
+                  }else{
+                    api.hideProgress();
+                    mytoast("没有更多数据了","middle");
+                  }
+               }else{
+                 api.hideProgress();
+                 mytoast(res.msg,"middle")
+               }
+          })
+      }
+
+  </script>
+  </html>

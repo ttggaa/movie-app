@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/iconfont.css" />
+      <style>
+          body{
+            background:#f8f8f8;
+          }
+    .items{margin:10px 0%;background:#fff;padding:0 0 8px 0px;position:relative;}
+    .items img{width:100%;height:200px;border-radius:0px 0px 0 0px;}
+    .items .bd{
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      justify-content:space-between;
+      -webkit-box-pack:justify;
+      -moz-justify-content:space-between;
+      -webkit-justify-content: space-between;
+      align-items:center;
+      -webkit-align-items:center;
+      box-align:center;
+      -moz-box-align:center;
+      -webkit-box-align:center;
+      color:#333;
+      font-size:15px;
+      padding:2px 10px;
+    }
+    .items .l{width:70%;overflow: hidden; /*自动隐藏文字*/text-overflow: ellipsis;/*文字隐藏后添加省略号*/white-space: nowrap;/*强制不换行*/}
+    .items .r{
+      display: -webkit-box;
+     display: -webkit-flex;
+     display: flex;
+   }
+   .aui-iconfont{font-size:18px;}
+   .iconfont{font-size:23px;}
+  .items .r .fx{margin-left:15px;}
+  .mfsk{display:inline;position:absolute;top:20px; background:#FF8D4F;font-size:15px; color:#fff;padding:3px 10px;border-radius:0 15px 15px 0px;}
+  .vico{display:inline;position:absolute;top:70px;left:43%;background-image:url(../image/vico.png);width:50px;height:50px;background-repeat:no-repeat;background-size:cover;}
+    </style>
+  </head>
+  <body>
+      <div class="aui-content aui-margin-b-15">
+            <div class="items" v-for="(item,index) in listData" :key="item.ID">
+                <div class="i p" :data-id="item.ID"  tapmode onclick="vm.fnplay()"><img  :data-url="item.MV_PHOTO_URL" class="img imgcache"/></div>
+                <div class="bd">
+                  <div class="l">{{item.MV_NAME}}</div>
+                  <div class="r">
+                    <div v-if="item.shoucang==0" class="iconfont icon-shoucang" :data-id="item.ID" :data-idx="index" tapmode onclick="fnshoucang()"></div>
+                    <div v-else class="iconfont icon-wodeshoucang" style="color:#FFD00E;" :data-id="item.ID" :data-idx="index" tapmode onclick="fnshoucang()"></div>
+                    <div class="iconfont icon-fenxiang2 fx" :data-id="item.ID" :data-idx="index" tapmode onclick="fnfenxiang()"></div>
+                  </div>
+                </div>
+                <div class="mfsk" v-if="item.MV_TYPE==1">免费试看</div>
+                <div class="mfsk" v-else>VIP视频</div>
+                <div class="vico p" :data-id="item.ID"  tapmode onclick="vm.fnplay()"></div>
+            </div>
+            <div v-if="jlNum==0" style="text-align:center;margin-top:50px;font-size:15px;color:#666;">暂无内容！</div>
+      </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+    var datas={
+      listData:[],
+      jlNum:1,
+      pagesize:10,
+      pageindex:0
+    }
+   var vm=new Vue({
+    el: '.aui-content',
+    data: datas,
+    methods:{
+      fnplay:function(){
+        var target = $api.closest(event.target, '.p');
+        var ids=$api.attr(target, 'data-id');
+        api.openWin({
+            name: 'play',
+            url: 'play.html',
+            pageParam: {
+                spid:ids
+            }
+        });
+      }
+    },
+    updated:function(){
+      api.parseTapmode();
+      imagecache();
+    }
+  })
+
+      apiready = function(){
+        api.parseTapmode();
+        fnDataList();
+        initPullRefresh();
+        scrolltobottom();//上拉加载更多
+      };
+
+      function fnfenxiang(){
+        var clipBoard = api.require('clipBoard');
+        var target = $api.closest(event.target, '.fx');
+        var spid=$api.attr(target, 'data-id');
+        var hyid = $api.getStorage('hyid');
+        var url=siteAdd+"shipin_show.html?id="+spid
+        if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+          url=siteAdd+"shipin_show.html?id="+spid+"&pid="+hyid
+        }
+         api.actionSheet({
+             buttons: ['复制链接']
+         }, function(ret, err){
+             if( ret ){
+                if(ret.buttonIndex==1){
+                  clipBoard.set({
+                      value:url
+                  }, function(ret, err) {
+                      if (ret) {
+                        mytoast("复制成功","middle");
+                      }
+                  });
+                }
+             }
+         });
+      }
+      function imagecache(){
+        var srcs=$api.domAll(".imgcache");
+        if(srcs.length>0){
+          for(var i=0;i<srcs.length;i++){
+            (function(obj){
+              api.imageCache({
+                  url:$api.attr(obj,'data-url'),
+                  thumbnail:false
+              }, function(ret, err){
+                  if( ret ){
+                    $api.attr(obj, 'src', ret.url);
+                  }
+                api.hideProgress();
+              });
+
+            })(srcs[i])
+          }
+        }
+      }
+
+      //收藏
+      function fnshoucang(){
+          mytoast("正在操作","middle");
+        var target = $api.closest(event.target, '.iconfont');
+        var spid=$api.attr(target, 'data-id');
+        var idx=$api.attr(target, 'data-idx');
+        var hyid = $api.getStorage('hyid');
+        var token =$api.getStorage('accessToken');
+        if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+          if ( typeof(spid) != undefined && typeof(spid) != 'undefined' && spid != null) {
+             getAjax('/shoucang',{uid:hyid,token:token,id:spid,type:1},function(res){
+               if(res.code==0){
+                 mytoast(res.msg,"middle");
+                 if(datas.listData[idx].shoucang==0){
+                   datas.listData[idx].shoucang=1;
+                 }else {
+                   datas.listData[idx].shoucang=0;
+                 }
+
+               }else if(res.code==2){
+                 api.alert({
+                     title: ' ',
+                     msg: '账号在别处登录,您已被迫下线！',
+                 }, function(ret, err){
+                   $api.clearStorage();
+                   //广播退出
+                   api.sendEvent({
+                       name: 'outlogin'
+                   })
+                 })
+               }else {
+                  mytoast(res.msg,"middle");
+               }
+             })
+          }else {
+            mytoast("未获取到视频ID","middle");
+          }
+        }else {
+          mytoast("您还未登录！","middle");
+        }
+      }
+      function fnDataList(){
+        var pgidx=0;
+        var pgs=datas.pagesize;
+        datas.pageindex = 0;//重置为0
+        var hyid = $api.getStorage('hyid');
+        var token =$api.getStorage('accessToken');
+        if ( typeof(hyid) == undefined && typeof(hyid) == 'undefined' && hyid == null) {
+            hyid=0;
+            token=0;
+        }
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中...',
+            text: ' ',
+            modal: true
+        });
+
+        getAjax('/jingmovie',{uid:hyid,token:token,pagesize:pgs,pageindex:pgidx},function(res){
+
+          if (res.code==0) {
+            api.hideProgress();
+            datas.listData=res.data;
+            if(res.data.length>0){
+              datas.jlNum=res.data.length
+            }else {
+              datas.jlNum=0
+            }
+            imagecache();
+          }else if(res.code==2){
+            api.alert({
+                title: '提示',
+                msg: '账号在别处登录,您已被迫下线！',
+            }, function(ret, err){
+              $api.clearStorage();
+              //广播退出
+              api.sendEvent({
+                  name: 'outlogin'
+              })
+              fnDataList();
+            })
+          }else{
+            api.hideProgress();
+            mytoast(res.msg,"middle")
+          }
+        })
+      }
+
+      function initPullRefresh() {
+        api.setRefreshHeaderInfo({
+            loadingImg: 'widget://image/refresh.png',
+            bgColor: '#ccc',
+            textColor: '#fff',
+            textDown: '下拉刷新...',
+            textUp: '松开刷新...'
+          }, function(ret, err) {
+            location.reload();
+            api.refreshHeaderLoadDone();
+              fnDataList();
+          });
+        };
+
+      //上拉加载更多
+      function scrolltobottom() {
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 50 //距离底部距离
+            }
+        }, function(ret, err) {
+            getmore();
+        });
+    }
+    function getmore(){
+      var pgsize =datas.pagesize;
+      var pgidx =datas.pageindex + 1;//当前页
+        datas.pageindex = pgidx;
+        var hyid = $api.getStorage('hyid');
+        var token =$api.getStorage('accessToken');
+        if ( typeof(hyid) == undefined && typeof(hyid) == 'undefined' && hyid == null) {
+            hyid=0;
+            token=0;
+        }
+         api.showProgress({
+              style: 'default',
+              animationType: 'fade',
+              title: '加载中...',
+              text: '',
+              modal: false
+            });
+         getAjax('/jingmovie',{uid:hyid,token:token,pagesize: pgsize, pageindex: pgidx},function(res){
+              if (res.code==0) {
+                if(res.data.length>0){
+                    var data = datas.listData;
+                    data = data.concat(res.data)
+                    datas.listData = data;
+                    api.hideProgress();
+                }else{
+                  api.hideProgress();
+                  mytoast("没有更多数据了","middle");
+                }
+             }else if(res.code==2){
+               api.alert({
+                   title: '提示',
+                   msg: '账号在别处登录,您已被迫下线！',
+               }, function(ret, err){
+                 $api.clearStorage();
+                 //广播退出
+                 api.sendEvent({
+                     name: 'outlogin'
+                 })
+                 fnDataList();
+               })
+             }else{
+               api.hideProgress();
+               mytoast(res.msg,"middle")
+             }
+        })
+    }
+
+  </script>
+  </html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+          body{
+            background: #F8F8F8;
+          }
+          .aui-content{margin-top:20px;}
+          .aui-list .aui-list-item-label{width:35%;text-align: right;padding-right:0px;justify-content: flex-end;
+           -webkit-box-pack:end;
+          -moz-justify-content: flex-end;
+          -webkit-justify-content:  flex-end;}
+          .btnbox{text-align: center;margin:15px 10px 10px 10px;}
+          .btn-login {background:#56B3F6;border:0px;height:45px;border-radius:30px;width:90%; color:#fff;font-size:15px;}
+          .link-area {display: block;margin-top: 25px;text-align: center;font-size:18px;color:#007AFF;}
+          .tips{font-size:13px;color:#C30D23;padding:20px;display:none;}
+      </style>
+  </head>
+  <body>
+      <div class="aui-content aui-margin-b-15">
+        <ul class="aui-list aui-form-list">
+          <li class="aui-list-item">
+                   <div class="aui-list-item-inner">
+                       <div class="aui-list-item-label">账&nbsp;&nbsp;号：</div>
+                       <div class="aui-list-item-input">
+                           <input id="username" type="text" class="input" value='' placeholder="请输入账号">
+                       </div>
+                   </div>
+               </li>
+               <li class="aui-list-item">
+                   <div class="aui-list-item-inner">
+                       <div class="aui-list-item-label">密&nbsp;&nbsp;码：</div>
+                       <div class="aui-list-item-input">
+                           <input id="password" type="password" class="input" value='' placeholder="请输入密码">
+                       </div>
+                   </div>
+               </li>
+               <li class="aui-list-item">
+                   <div class="aui-list-item-inner">
+                       <div class="aui-list-item-label">确认密码：</div>
+                       <div class="aui-list-item-input">
+                           <input id="rpassword" type="password" class="input" value='' placeholder="请输入确认密码">
+                       </div>
+                   </div>
+               </li>
+        </ul>
+        <div id="tips" class="tips"></div>
+        <div class="btnbox">
+   				<button id='register' class="btn-login" tapmode onclick="fnregister();">立即注册</button>
+   				<div class="link-area"><span tapmode onclick="fnlogin()">去登录</span></div>
+   			</div>
+      </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript">
+      apiready = function(){
+        api.parseTapmode();
+      };
+
+      function fnlogin(){
+        api.closeWin();
+      }
+      function fnregister(){
+        var username=$api.byId("username").value;
+        var pass=$api.byId('password').value;
+        var rpassword=$api.byId('rpassword').value;
+        if(isNull(username)){
+          mytoast("请输入用户名","middle");
+          return false;
+        }
+        if(isNull(pass)){
+          mytoast("请输入密码","middle");
+          return false;
+        }
+        if(isNull(rpassword)){
+          mytoast("请输入确认密码","middle");
+          return false;
+        }
+        if(pass!=rpassword){
+          mytoast("两次密码不一致","middle");
+          return false;
+        }
+        var regUser=/^[a-zA-Z][a-zA-Z0-9]{3,15}$/;
+        var regPass=/^[a-zA-Z0-9]{4,10}$/;
+        if(!regUser.test(username)){
+          mytoast("用户名不合法","middle");
+          $api.css($api.byId('tips'), 'display:block');
+          $api.text($api.byId('tips'), '用户名由英文字母和数字组成的4-16位字符，以字母开头');
+          return false;
+        }
+        if(!regPass.test(pass)){
+          mytoast("密码不合法","middle");
+          $api.css($api.byId('tips'), 'display:block');
+          $api.text($api.byId('tips'), '密码由英文字母和数字组成的4-10位字符');
+          return false;
+        }
+        $api.text($api.byId('tips'), '');
+        $api.css($api.byId('tips'), 'display:none');
+
+        var btn=$api.byId('register');
+        btn.disabled=true;
+        btn.innerText="正在提交，请稍候..."
+        api.parseTapmode();
+        getAjax('/register',{name: username,password:pass,pid:0},function(res){
+          if (res.code == "0") {
+            $api.setStorage('zcid', res.data.uid);//记录用户ID为正在注册ID
+            $api.byId("username").value='';
+            $api.byId("password").value='';
+            $api.byId('rpassword').value='';
+            btn.disabled = false;
+            btn.innerText = "立即注册";
+            api.openWin({
+                name: 'mibao',
+                url: 'mibao.html',
+                pageParam: {t:1}
+            });
+          }else{
+            btn.disabled = false;
+            btn.innerText = "立即注册";
+            mytoast(res.msg,"middle");
+          }
+        })
+
+      }
+  </script>
+  </html>

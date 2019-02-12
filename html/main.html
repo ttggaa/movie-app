@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui-slide.css"/>
+      <style>
+        .aui-slide-node img {
+            width: 100%;
+            height: 100%;
+          }
+  .slide-title{color:#fff;position:absolute;bottom:0px;left:0px;width:100%;height:30px;line-height:30px;text-align:left;text-indent:12px;opacity:0.8;background-color:rgba(0,0,0,0.5);}
+  .tit-box{margin:20px 3% 0px 3%;}
+  .tit-box .tit-left{
+       float:left;
+       width:60%;
+       display: -webkit-box;
+       display: -webkit-flex;
+       display: flex;
+       align-items:center;
+       -webkit-align-items:center;
+       box-align:center;
+       -moz-box-align:center;
+       -webkit-box-align:center;
+     }
+  .tit-box .tit-left .h{background:#56B3F6;height:20px;width:6px;border-radius:2px;}
+  .tit-box .tit-left .tit{font-size:15px;color:#333;margin-left: 5px;font-weight: bold;}
+  .tit-box .tit-right{float:right;width:40%;text-align:right;}
+  .tit-box .tit-right span{color:#9E9E9E;font-size:13px;text-decoration:none;}
+
+  .list{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    justify-content:space-between;
+    -webkit-box-pack:justify;
+    -moz-justify-content:space-between;
+    -webkit-justify-content: space-between;
+    -webkit-flex-wrap:wrap;
+    -webkit-box-lines:multiple;
+    -moz-flex-wrap:wrap;
+    flex-wrap:wrap;
+  }
+  .item{width:49%;margin-top:15px;overflow: hidden;}
+  .item .img{width:100%; height:125px;border-radius:0px;}
+  .item .bd{
+          padding:0 10px;
+           margin-top:5px;
+           display: -webkit-box;
+           display: -webkit-flex;
+           display: flex;
+           justify-content:space-between;
+           -webkit-box-pack:justify;
+           -moz-justify-content:space-between;
+           -webkit-justify-content: space-between;
+           align-items:center;
+           -webkit-align-items:center;
+           box-align:center;
+           -moz-box-align:center;
+           -webkit-box-align:center;
+    }
+  .item .title{width:60%; color:#333;font-size: 14px;overflow: hidden; /*自动隐藏文字*/text-overflow: ellipsis;/*文字隐藏后添加省略号*/white-space: nowrap;/*强制不换行*/}
+  .item .titles{width:100%; color:#333;font-size: 14px;overflow: hidden; /*自动隐藏文字*/text-overflow: ellipsis;/*文字隐藏后添加省略号*/white-space: nowrap;/*强制不换行*/}
+  .item .guankan{padding:0px 5px;font-size: 12px;background:#56B3F6;border-radius:10px;color:#fff;}
+  .item .guankan a{color:#fff;}
+  .item .vip{background:#FED61A;}
+
+  .items{margin:10px 0%;background:#fff;padding:0 0 8px 0px;position:relative;}
+  .items img{width:100%;height:200px;border-radius:0px 0px 0 0px;}
+  .items .bd{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    justify-content:space-between;
+    -webkit-box-pack:justify;
+    -moz-justify-content:space-between;
+    -webkit-justify-content: space-between;
+    align-items:center;
+    -webkit-align-items:center;
+    box-align:center;
+    -moz-box-align:center;
+    -webkit-box-align:center;
+    color:#333;
+    font-size:15px;
+    padding:2px 10px;
+  }
+.items .l{width:90%;overflow: hidden; /*自动隐藏文字*/text-overflow: ellipsis;/*文字隐藏后添加省略号*/white-space: nowrap;/*强制不换行*/}
+  .mfsk{display:inline;position:absolute;top:20px; background:#FF8D4F;font-size:15px; color:#fff;padding:3px 10px;border-radius:0 15px 15px 0px;}
+  .vico{display:inline;position:absolute;top:70px;left:43%;background-image:url(../image/vico.png);width:50px;height:50px;background-repeat:no-repeat;background-size:cover;}
+      </style>
+  </head>
+  <body>
+  <div class="aui-content aui-margin-b-15">
+    <div id="aui-slide"  v-if="isShow">
+     <div class="aui-slide-wrap" >
+         <div class="aui-slide-node" v-for="item in bannerList" :key="item.id" :data-id="item.BN_TYPE_ID" tapmode onclick="vm.fnbanner()">
+             <img :src="item.BN_URL" />
+             <p class="slide-title">{{item.BN_NAME}}</p>
+         </div>
+     </div>
+     <div class="aui-slide-page-wrap"><!--分页容器--></div>
+   </div>
+    <div class="mianfei"  v-if="isShow">
+      <div class="tit-box">
+          <div class="tit-left"><div class="h"></div><div class="tit">免费影片</div></div>
+          <div class="tit-right"><span tapmode onclick="fnnav(2)">更多>></span></div>
+          <div class="clear"></div>
+       </div>
+       <div class="list">
+            <div class="item p" v-for="(item,index) in mianfeiData" :key="index" :data-id="item.ID"  tapmode onclick="vm.fnplay()">
+               <img :data-url="item.MV_PHOTO_URL" class="img imgcache"/>
+               <div class="bd"><div class="title">{{item.MV_NAME}}</div><div class="guankan">免费观看</div></div>
+            </div>
+       </div>
+    </div>
+
+    <div class="zuixin"  v-if="isShow">
+      <div class="tit-box">
+          <div class="tit-left"><div class="h"></div><div class="tit">最新影片</div></div>
+          <div class="tit-right"><span tapmode onclick="fnnav(2)">更多>></span></div>
+          <div class="clear"></div>
+       </div>
+       <div class="list" >
+           <div class="item p" v-for="(item,key) in zuixinData" :key="item.ID" :data-id="item.ID"  tapmode onclick="vm.fnplay()">
+               <img :data-url="item.MV_PHOTO_URL" class="img imgcache"/>
+               <div class="bd"><div class="title">{{item.MV_NAME}}</div>
+                   <div v-if="item.MV_TYPE==1" class="guankan">免费视频</div>
+                   <div v-else class="guankan vip">VIP视频</div>
+               </div>
+           </div>
+       </div>
+      </div>
+
+        <div class="jingxuan"  v-if="isShow">
+            <div class="tit-box">
+              <div class="tit-left"><div class="h"></div><div class="tit">精选视频</div></div>
+              <div class="tit-right"><span tapmode onclick="fnnav(1)">更多>></span></div>
+              <div class="clear"></div>
+            </div>
+             <div class="list">
+                  <div class="item p" v-for="(item,key) in jingxuanData" :key="item.ID" :data-id="item.ID"  tapmode onclick="vm.fnplay()">
+                      <img :data-url="item.MV_PHOTO_URL" class="img imgcache"/>
+                      <div class="bd"><div class="title">{{item.MV_NAME}}</div>
+                          <div v-if="item.MV_TYPE==1" class="guankan">免费视频</div>
+                          <div v-else class="guankan vip">VIP视频</div>
+                      </div>
+                  </div>
+              </div>
+        </div>
+
+      <div class="manhua" v-if="isShow">
+        <div class="tit-box">
+          <div class="tit-left"><div class="h"></div><div class="tit">精选漫画</div></div>
+          <div class="tit-right"><span tapmode onclick="fnnav(3)">更多>></span></div>
+          <div class="clear"></div>
+        </div>
+        <div class="list">
+            <div class="item" v-for="(item,key) in manhuaData" :key="item.ID" :data-id="item.ID"  tapmode onclick="vm.fnmanhua()">
+                <img :data-url="item.CT_PHOTO_URL" class="img imgcache"/>
+                <div class="bd"><div class="titles">{{item.CT_NAME}}</div></div>
+            </div>
+        </div>
+       </div>
+       <div class="yingpian"  v-if="isShow">
+           <div class="tit-box">
+             <div class="tit-left"><div class="h"></div><div class="tit">影片列表</div></div>
+             <div class="tit-right"></div>
+             <div class="clear"></div>
+           </div>
+           <div class="items" v-for="(item,index) in yingpianData" :key="item.ID">
+               <div class="i p" :data-id="item.ID"  tapmode onclick="vm.fnplay()"><img :data-url="item.MV_PHOTO_URL" class="img imgcache"/></div>
+               <div class="bd">
+                 <div class="l">{{item.MV_NAME}}</div>
+               </div>
+               <div class="mfsk" v-if="item.MV_TYPE==1">免费试看</div>
+               <div class="mfsk" v-else>VIP视频</div>
+               <div class="vico p" :data-id="item.ID"  tapmode onclick="vm.fnplay()"></div>
+           </div>
+       </div>
+  </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript" src="../script/aui-slide.js"></script>
+  <script type="text/javascript">
+    var datas={
+          isShow:false,
+          bannerList: '',//banner
+          mianfeiData: '',//免费影片
+          yingpianData:'',//影片列表
+          zuixinData: '',//最新影片
+          jingxuanData: '',//精选视频
+          manhuaData:'',//精选漫画,
+          pagesize:6,
+          pageindex:0
+    }
+  var vm=new Vue({
+      el: '.aui-content',
+      data: datas,
+      methods:{
+        fnplay:function(){
+          var target = $api.closest(event.target, '.p');
+          var ids=$api.attr(target, 'data-id');
+          if(ids!=0){
+            api.openWin({
+                name: 'play',
+                url: 'play.html',
+                pageParam: {
+                    spid:ids
+                }
+            });
+          }
+        },
+        fnbanner:function(){
+          var target = $api.closest(event.target, '.aui-slide-node');
+          var ids=$api.attr(target, 'data-id');
+          if(ids!=0){
+            api.openWin({
+                name: 'play',
+                url: 'play.html',
+                pageParam: {
+                    spid:ids
+                }
+            });
+          }
+        },
+        fnmanhua:function(){
+          var target = $api.closest(event.target, '.item');
+          var ids=$api.attr(target, 'data-id');
+          api.openWin({
+              name: 'mh_list',
+              url: 'mh_list.html',
+              pageParam: {
+                  mhid:ids
+              }
+          });
+        }
+      },
+      updated:function(){
+        api.parseTapmode();
+        var slide = new auiSlide({
+          container:document.getElementById("aui-slide"),
+          "height":200,
+          "speed":500,
+          "autoPlay": 3000, //自动播放
+          "loop":true,
+          "pageShow":true,
+          "pageStyle":'dot',
+          'dotPosition':'right'
+        })
+        imagecache();
+      }
+    })
+      apiready = function(){
+        api.parseTapmode();
+        fnbanner();
+        fnListData();
+        var sType = api.systemType;//获取系统类型
+        if(sType=="ios"){
+            getVer(1);
+        }else if(sType=="android"){
+            getVer(2);
+        }
+        initPullRefresh();//下拉加载
+        scrolltobottom();//上拉加载更多
+      };
+
+      function imagecache(){
+        var srcs=$api.domAll(".imgcache");
+        if(srcs.length>0){
+          for(var i=0;i<srcs.length;i++){
+            (function(obj){
+              api.imageCache({
+                  url:$api.attr(obj,'data-url'),
+                  thumbnail:false
+              }, function(ret, err){
+                  if( ret ){
+                    $api.attr(obj, 'src', ret.url);
+                  }
+                api.hideProgress();
+              });
+
+            })(srcs[i])
+          }
+        }
+      }
+
+      //获取版本号
+      function getVer(t){
+        var ver=api.appVersion;//获取版本号
+
+        getAjax('/banben',{type:t},function(res){
+          if(res.code==0){
+           if ( typeof(res.data) != undefined && typeof(res.data) != 'undefined' && res.data != null && res.data != 0) {
+            if(res.data.APP_NUM>ver){
+              api.confirm({
+                  title: '更新提示',
+                  msg: '有新版本更新，版本号:'+res.data.APP_NUM,
+                  buttons: ['取消', '立即更新']
+              }, function(ret, err){
+                  if( ret ){
+                    var index = ret.buttonIndex;
+                    if(index==2){
+                      if(api.systemType=="android"){
+                        api.download({
+                            url: res.data.APP_HREF,
+                            report: true,
+                        },function(ret, err){
+                            if(ret&&0==ret.state){
+                             api.toast({
+                                 msg: '下载中...'+ret.percent+'%',
+                                 duration: 2000
+                             });
+                           }
+                           if(ret&&1==ret.state){
+                             var savePath=ret.savePath;
+                             api.installApp({
+                                 appUri:savePath
+                             });
+                           }
+                        });
+                      }
+                      if(api.systemType=="ios"){
+                        api.installApp({
+                          appUri:res.data.APP_HREF
+                        })
+                      }
+                    }
+                  }
+              });
+
+            }
+           }
+          }
+        })
+      }
+      //下拉刷新
+      function initPullRefresh() {
+        api.setRefreshHeaderInfo({
+            loadingImg: 'widget://image/refresh.png',
+            bgColor: '#ccc',
+            textColor: '#fff',
+            textDown: '下拉刷新...',
+            textUp: '松开刷新...'
+          }, function(ret, err) {
+              fnbanner();
+              fnListData();
+          });
+        };
+      function fnbanner(){
+        getAjax('/banner',{type:1},function(res){
+          if (res.code==0) {
+           datas.bannerList=res.data;
+          }else{
+            mytoast(res.msg,"middle")
+          }
+        })
+      }
+
+      function fnListData(){
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中...',
+            text: ' ',
+            modal: true
+        });
+        getAjax('/indexcont',{},function(res){
+          if (res.code==0) {
+            api.hideProgress();
+            api.refreshHeaderLoadDone();
+            datas.isShow=true;
+            datas.mianfeiData = res.data.mianfei;
+            datas.zuixinData = res.data.new;
+            datas.jingxuanData = res.data.jingxuan;
+            datas.manhuaData = res.data.manhua;
+            imagecache();
+          }else{
+            api.hideProgress();
+            mytoast("网络超时，为获取到数据","middle")
+          }
+        })
+        var pgidx=0;
+        var pgs=datas.pagesize;
+        datas.pageindex = 0;//重置为0
+        getAjax('/hotmovie',{pagesize:pgs,pageindex:pgidx},function(res){
+          if (res.code==0) {
+            //api.hideProgress()
+            datas.yingpianData=res.data;
+            imagecache();
+          }else{
+            //api.hideProgress();
+            mytoast(res.msg,"middle")
+          }
+        })
+      }
+
+      //上拉加载更多
+        function scrolltobottom() {
+              api.addEventListener({
+                  name: 'scrolltobottom',
+                  extra: {
+                      threshold: 50 //距离底部距离
+                  }
+              }, function(ret, err) {
+                  getmore();
+              });
+          }
+          function getmore(){
+            var pgsize =datas.pagesize;
+            var pgidx =datas.pageindex + 1;//当前页
+              datas.pageindex = pgidx;
+               api.showProgress({
+                    style: 'default',
+                    animationType: 'fade',
+                    title: '加载中...',
+                    text: '',
+                    modal: false
+                  });
+               getAjax('/hotmovie',{pagesize: pgsize, pageindex: pgidx},function(res){
+                    if (res.code==0) {
+                      if(res.data.length>0){
+                          var data = datas.yingpianData;
+                          data = data.concat(res.data)
+                          datas.yingpianData = data;
+                          api.hideProgress();
+                      }else{
+                        api.hideProgress();
+                        mytoast("没有更多数据了","middle");
+                      }
+                   }else{
+                     api.hideProgress();
+                     mytoast(res.msg,"middle")
+                   }
+              })
+          }
+      
+      function fnnav(idx){
+        api.execScript({
+            script: 'fnnav('+idx+');'
+        });
+      }
+  </script>
+  </html>

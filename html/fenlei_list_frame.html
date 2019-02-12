@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+      .listbox{display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;justify-content:space-between;padding:15px 5px;height:130px;position:relative;border-bottom:1px solid #f2f2f2;}
+      .list{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        justify-content:space-between;
+        -webkit-box-pack:justify;
+        -moz-justify-content:space-between;
+        -webkit-justify-content: space-between;
+        -webkit-flex-wrap:wrap;
+    -webkit-box-lines:multiple;
+    -moz-flex-wrap:wrap;
+    flex-wrap:wrap;
+      }
+      .listbox .imgbox{width:40%;overflow:hidden;}
+      .listbox .imgbox img{width:100%;height:100%;border-radius:0px;}
+      .listbox .infobox{width:58%;overflow:hidden;margin-left:2%;}
+      .listbox .infobox .name{font-size:15px;color:#333;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+      .listbox .infobox .status{margin-top:10px;font-size:13px;}
+      .listbox .infobox .status .vip{background:#FFC90C;color:#fff;border-radius:20px;padding:3px 10px;}
+      .listbox .infobox .status .mian{background:#56B3F6;color:#fff;border-radius:20px;padding:3px 10px;}
+      .listbox .infobox .notes{font-size:13px;color:#bbb;margin-top:8px;width:80%;max-height:60px;overflow:hidden;}
+
+      .item{width:49%;margin-top:15px;overflow: hidden;}
+      .item .img{width:100%; height:125px;}
+      .item .bd{
+        margin-top:5px;
+        padding: 0 10px;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        justify-content:space-between;
+        -webkit-box-pack:justify;
+        -moz-justify-content:space-between;
+        -webkit-justify-content: space-between;
+      }
+      .item .title{width:60%; color:#333;font-size: 14px;overflow: hidden; /*自动隐藏文字*/text-overflow: ellipsis;/*文字隐藏后添加省略号*/white-space: nowrap;/*强制不换行*/}
+    </style>
+  </head>
+  <body>
+  <div class="aui-content aui-margin-b-15">
+        <div v-if="type==1">
+            <div class="listbox" v-for="item in listData" :key="item.ID">
+                <div class="imgbox c" :data-id="item.ID" onclick="vm.fnopenWin(1)">
+                      <img :data-url="item.pic" class="imgcache" />
+                </div>
+                <div class="infobox">
+                    <div class="name c" :data-id="item.ID" onclick="vm.fnopenWin(1)">{{item.name}}</div>
+                    <div class="status"><span class="vip" v-if="item.type==2">VIP视频</span><span class="mian" v-else>免费观看</span></div>
+                    <div class="notes">{{item.content}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="list" v-else>
+            <div class="item c" v-for="item in listData" :key="item.ID" tapmode  :data-id="item.ID" onclick="vm.fnopenWin(2)">
+              <img :data-url="item.pic" class="img imgcache"/>
+              <div class="bd"><span class="title">{{item.name}}</span></div>
+            </div>
+       </div>
+       <div v-if="jlNum==0" style="text-align:center;margin-top:50px;font-size:15px;color:#666;">暂无内容！</div>
+  </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+      var datas={
+          listData:'',
+          jlNum: 1,
+          typeid: 0,
+          pageSize: 20,
+          pageIndex:0,
+          type: 1,//类型1视频2漫画
+      }
+    var vm=new Vue({
+        el: '.aui-content',
+        data: datas,
+        methods:{
+          fnopenWin:function(t){
+            var target= $api.closest(event.target, '.c');
+            var ids=$api.attr(target, 'data-id');
+            if(t==1){
+              api.openWin({
+                  name: 'play',
+                  url: 'play.html',
+                  pageParam: {
+                      spid:ids
+                  }
+              });
+            }else{
+              api.openWin({
+                  name: 'mh_list',
+                  url: 'mh_list.html',
+                  pageParam: {
+                      mhid:ids
+                  }
+              });
+            }
+          }
+        },updated:function(){
+          api.parseTapmode();
+          imagecache();
+        }
+      })
+      apiready = function(){
+        api.parseTapmode();
+        datas.typeid=api.pageParam.id;//获取ID
+        datas.type=api.pageParam.t;
+        fnDataList();
+        initPullRefresh();
+        scrolltobottom();//上拉加载更多
+      };
+
+      function fnDataList(){
+            api.showProgress({
+                  style: 'default',
+                  animationType: 'fade',
+                  title: '加载中...',
+                  text: ' ',
+                  modal: true
+            });
+            var pageS=datas.pageSize;
+            datas.pageIndex=0;
+            var t=datas.type;
+            var typeid=datas.typeid;
+            if ( typeof(typeid) != undefined && typeof(typeid) != 'undefined' && typeid != null) {
+              getAjax('/classcont',{pagesize: pageS, pageindex: 0, type: t, cid: typeid},function(res){
+                api.refreshHeaderLoadDone();
+                  if (res.code==0) {
+                    api.hideProgress();
+                    datas.listData=res.data;
+                      imagecache();
+                    if(res.data.length>0){
+                      datas.jlNum=res.data.length
+                    }else {
+                      datas.jlNum=0
+                    }
+                  }else{
+                    api.hideProgress();
+                    mytoast(res.msg,"middle")
+                  }
+                })
+            }else {
+              api.hideProgress();
+              mytoast("未获取到分类ID","middle")
+              setTimeout(function(){
+                api.closeWin();
+              },1500)
+            }
+      }
+
+    function initPullRefresh() {
+        api.setRefreshHeaderInfo({
+            loadingImg: 'widget://image/refresh.png',
+            bgColor: '#ccc',
+            textColor: '#fff',
+            textDown: '下拉刷新...',
+            textUp: '松开刷新...'
+          }, function(ret, err) {
+              fnDataList();
+          });
+        };
+
+      //上拉加载更多
+      function scrolltobottom() {
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 50 //距离底部距离
+            }
+        }, function(ret, err) {
+            getmore();
+        });
+    }
+    function imagecache(){
+      var srcs=$api.domAll(".imgcache");
+      if(srcs.length>0){
+        for(var i=0;i<srcs.length;i++){
+          (function(obj){
+            api.imageCache({
+                url:$api.attr(obj,'data-url'),
+                thumbnail:false
+            }, function(ret, err){
+                if( ret ){
+                  $api.attr(obj, 'src', ret.url);
+                }
+              api.hideProgress();
+            });
+
+          })(srcs[i])
+        }
+      }
+    }
+
+    function getmore(){
+      var pgsize =datas.pageSize;
+      var pgidx =datas.pageIndex + 1;//当前页
+      datas.pageIndex = pgidx;
+      var t=datas.type;
+      var typeid=datas.typeid;
+      if ( typeof(typeid) != undefined && typeof(typeid) != 'undefined' && typeid != null) {
+        api.showProgress({
+             style: 'default',
+             animationType: 'fade',
+             title: '加载中...',
+             text: '',
+             modal: false
+         });
+         getAjax('/classcont',{pagesize: pgsize, pageindex: pgidx, type: t, cid: typeid},function(res){
+              if (res.code==0) {
+                if(res.data.length>0){
+                    var data = datas.listData;
+                    data = data.concat(res.data)
+                    datas.listData = data;
+                    api.hideProgress();
+                }else{
+                  api.hideProgress();
+                  mytoast("没有更多数据了","middle");
+                }
+             }else{
+               api.hideProgress();
+               mytoast(res.msg,"middle")
+             }
+          })
+      }else{
+        api.hideProgress();
+        mytoast("未获取到分类ID","middle")
+        setTimeout(function(){
+          api.closeWin();
+        },1500)
+      }
+    }
+  </script>
+  </html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+        body {background: #F8F8F8;}
+          .header-item {
+              display: none;
+          }
+          .header-item-act {
+              display: block;
+          }
+
+          .aui-content{margin-top:10px;}
+          .aui-list .aui-list-item-label{width:20%;padding-right:0px;justify-content: flex-end;
+           -webkit-box-pack:end;
+          -moz-justify-content: flex-end;
+          -webkit-justify-content:  flex-end;}
+          .input{color:#333;}
+          .aui-list-item-input input:disabled{color:#333;opacity:1;
+            -webkit-text-fill-color:#333;
+            -webkit-opacity:1;}
+          .btn{display:block; background:#56B3F6;border:0px;height:45px;border-radius:30px;width:80%;text-align:center;line-height:45px;margin:0 auto; color:#fff;font-size:15px;margin-top:20px;}
+          .citem{display:none;}
+          .act{display:block;}
+      </style>
+  </head>
+  <body>
+    <header class="aui-bar aui-bar-nav" id="aui-header">
+       <div id="zh1" class="header-item header-item-act">
+         <a class="aui-pull-left event-back" tapmode onclick="fnback()">
+           <span class="aui-iconfont aui-icon-left"></span>
+         </a>
+         <div class="aui-title">找回密码</div>
+       </div>
+       <div id="zh2" class="header-item">
+         <a class="aui-pull-left event-back" tapmode onclick="fnback()">
+           <span class="aui-iconfont aui-icon-left"></span>
+         </a>
+         <div class="aui-title">找回密码(2/3)</div>
+       </div>
+       <div id="zh3" class="header-item">
+         <a class="aui-pull-left event-back" tapmode onclick="fnback()">
+           <span class="aui-iconfont aui-icon-left"></span>
+         </a>
+         <div class="aui-title">找回密码(3/3)</div>
+       </div>
+    </header>
+   <div class="aui-content aui-margin-b-15">
+     <div id="one" class="citem act" style="margin-top:30px;">
+       <ul class="aui-list aui-form-list">
+         <li class="aui-list-item">
+                  <div class="aui-list-item-inner">
+                      <div class="aui-list-item-label"> 账号：</div>
+                      <div class="aui-list-item-input">
+                          <input id='username' type="text" value='' placeholder="请输入账号">
+                      </div>
+                  </div>
+          </li>
+        </ul>
+        <div class="btnbox">
+            <button class="btn" id="next" tapmode onclick="fnnext();">下一步</button>
+         </div>
+     </div>
+     <div id="two" class="citem">
+       <ul class="aui-list aui-form-list">
+         <li class="aui-list-item">
+            <div class="aui-list-item-inner">
+              <div class="aui-list-item-input">
+                  <input id='question1' type="text" class="input"  disabled="disabled">
+              </div>
+            </div>
+          </li>
+          <li class="aui-list-item">
+             <div class="aui-list-item-inner">
+               <div class="aui-list-item-input">
+                   <input id='answer1' type="text" placeholder="请输入答案">
+               </div>
+             </div>
+           </li>
+           <li class="aui-list-item">
+              <div class="aui-list-item-inner">
+                <div class="aui-list-item-input">
+                    <input id='question2' type="text" class="input"  disabled="disabled">
+                </div>
+              </div>
+            </li>
+            <li class="aui-list-item">
+               <div class="aui-list-item-inner">
+                 <div class="aui-list-item-input">
+                     <input id='answer2' type="text" placeholder="请输入答案">
+                 </div>
+               </div>
+             </li>
+             <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                  <div class="aui-list-item-input">
+                      <input id='question3' type="text" class="input"  disabled="disabled">
+                  </div>
+                </div>
+              </li>
+              <li class="aui-list-item">
+                 <div class="aui-list-item-inner">
+                   <div class="aui-list-item-input">
+                       <input id='answer3' type="text" placeholder="请输入答案">
+                   </div>
+                 </div>
+               </li>
+        </ul>
+        <div class="btnbox">
+            <button class="btn" id="yanzheng" tapmode onclick="fnyanzheng();">验证</button>
+         </div>
+     </div>
+     <div id="three" class="citem">
+       <ul class="aui-list aui-form-list">
+         <li class="aui-list-item">
+                  <div class="aui-list-item-inner">
+                      <div class="aui-list-item-label">新密码：</div>
+                      <div class="aui-list-item-input">
+                          <input id="password" type="password" value='' placeholder="请输入密码">
+                      </div>
+                  </div>
+              </li>
+              <li class="aui-list-item">
+                  <div class="aui-list-item-inner">
+                      <div class="aui-list-item-label">确认密码：</div>
+                      <div class="aui-list-item-input">
+                          <input id="rpassword" type="password" value='' placeholder="请输入确认密码">
+                      </div>
+                  </div>
+              </li>
+         </ul>
+         <div class="btnbox">
+             <button class="btn" id="tijiao" tapmode onclick="fnUppass();">提交</button>
+          </div>
+     </div>
+   </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript">
+  var zhid=0;
+    apiready = function(){
+        api.parseTapmode();
+        fnInit();
+    }
+    var headers,headerHeight;
+    function fnInit() {
+        var header = $api.byId('aui-header');
+
+        headers = $api.domAll(header, '.header-item');
+
+        for (var i = 0; i < headers.length; i++) {
+            $api.fixIos7Bar(headers[i]);
+        }
+        headerHeight = $api.offset(header).h;
+    };
+    function fnback(){
+      api.closeWin();
+    }
+    function fnnext(){
+        var username =$api.byId('username').value;
+        if (isNull(username)) {
+             mytoast("请输入用户名","middle");
+             return false;
+        }
+        var btn=$api.byId('next');
+        btn.disabled=true;
+        btn.innerText="正在提交，请稍候..."
+        getAjax('/checkuser',{name: username},function(res){
+          if (res.code==0) {
+            zhid=res.data.ID;
+            fnQuestion(res.data.ID);
+            setTimeout(function(){
+              btn.disabled = false;
+              btn.innerText = "下一步";
+            },1500)
+          }else {
+            btn.disabled = false;
+            btn.innerText = "下一步";
+            mytoast(res.msg,"middle")
+          }
+        })
+    }
+
+    function fnQuestion(zhid){
+      if ( typeof(zhid) != undefined && typeof(zhid) != 'undefined' && zhid != null) {
+        getAjax('/pwdwenti',{uid:zhid},function(res){
+          if (res.code==0) {
+            $api.byId('question1').value=res.data[0];
+            $api.byId('question2').value=res.data[1];
+            $api.byId('question3').value=res.data[2];
+
+            $api.removeCls($api.byId('zh1'), 'header-item-act');
+            $api.removeCls($api.byId('zh3'), 'header-item-act');
+            $api.addCls($api.byId('zh2'), 'header-item-act');
+            $api.removeCls($api.byId('one'), 'act');
+            $api.removeCls($api.byId('three'), 'act');
+            $api.addCls($api.byId('two'), 'act');
+          //  fnQuestion(res.data.ID);
+          }else {
+            mytoast(res.msg,"middle")
+          }
+        })
+      }else {
+        mytoast("未获取到用户ID","middle")
+      }
+    }
+    //验证密保问题
+    function fnyanzheng(){
+      var ans1 =$api.byId('answer1').value;
+      var ans2 =$api.byId('answer2').value;
+      var ans3 =$api.byId('answer3').value;
+      if (isNull(ans1)) {
+           mytoast("请输入问题1的答案!","middle");
+           return false;
+      }
+      if (isNull(ans2)) {
+           mytoast("请输入问题2的答案!","middle");
+           return false;
+      }
+      if (isNull(ans3)) {
+           mytoast("请输入问题3的答案!","middle");
+           return false;
+      }
+      var btn=$api.byId('yanzheng');
+      btn.disabled=true;
+      btn.innerText="正在验证，请稍候..."
+      if ( typeof(zhid) != undefined && typeof(zhid) != 'undefined' && zhid != null) {
+        getAjax('/pwdanswer',{uid:zhid,answer1:ans1,answer2:ans2,answer3:ans3},function(res){
+          if (res.code==0) {
+            $api.removeCls($api.byId('zh1'), 'header-item-act');
+            $api.removeCls($api.byId('zh2'), 'header-item-act');
+            $api.addCls($api.byId('zh3'), 'header-item-act');
+            $api.removeCls($api.byId('one'), 'act');
+            $api.removeCls($api.byId('two'), 'act');
+            $api.addCls($api.byId('three'), 'act');
+            //fnUppass();
+
+            btn.disabled = false;
+            btn.innerText = "验证";
+          }else {
+            btn.disabled = false;
+            btn.innerText = "验证";
+            mytoast(res.msg,"middle")
+          }
+        })
+      }else {
+          mytoast("未获取到用户ID","middle")
+      }
+    }
+
+    function fnUppass(){
+      var pass =$api.byId('password').value;
+      var rpass =$api.byId('rpassword').value;
+      if (isNull(pass)) {
+           mytoast("请输入新密码","middle");
+           return false;
+      }
+      if (isNull(rpass)) {
+           mytoast("请输入确认密码","middle");
+           return false;
+      }
+      if (pass!=rpass) {
+           mytoast("两次密码不一致!","middle");
+           return false;
+      }
+      var btn=$api.byId('tijiao');
+      btn.disabled=true;
+      btn.innerText="正在验证，请稍候..."
+      if ( typeof(zhid) != undefined && typeof(zhid) != 'undefined' && zhid != null) {
+        getAjax('/newpwd',{uid: zhid, pwd: pass},function(res){
+            if (res.code==0) {
+              mytoast("密码找回成功","middle");
+              setTimeout(function(){
+                api.closeToWin({
+                    name: 'login'
+                });
+              },2000)
+            }else {
+              btn.disabled = false;
+              btn.innerText = "提交";
+              mytoast(res.msg,"middle")
+            }
+        })
+      }else{
+          mytoast("未获取到用户ID","middle")
+      }
+    }
+  </script>
+  </html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+          body{
+            background:#F8F8F8;
+          }
+          .aui-content{margin-top:20px;}
+
+          .aui-list .aui-list-item-label{width:25%;text-align: right;padding-right:0px;}
+          .btnbox{text-align: center;margin:25px 10px 10px 10px;}
+          .btn-login {background:#56B3F6;border:0px;height:45px;border-radius:30px;width:90%; color:#fff;font-size:15px;}
+          .link-area {display: block;margin-top: 25px;text-align: center;font-size:15px;color:#007AFF;}
+          .link-area span{font-size: 18px;}
+          .spliter {color: #bbb;padding: 0px 8px;}
+      </style>
+  </head>
+  <body>
+    <div class="aui-content aui-margin-b-15">
+     <ul class="aui-list aui-form-list">
+       <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label"> 账号：</div>
+                    <div class="aui-list-item-input">
+                        <input id="username" type="text" class="input" value='' placeholder="请输入账号">
+                    </div>
+                </div>
+            </li>
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label">密码：</div>
+                    <div class="aui-list-item-input">
+                        <input id="password" type="password" class="input" value='' placeholder="请输入密码">
+                    </div>
+                </div>
+            </li>
+     </ul>
+     <div class="btnbox">
+				<button id='login' class="btn-login" tapmode onclick="fnLogin();">登录</button>
+				<div class="link-area"><span tapmode onclick="register()">注册账号</span> <span class="spliter">|</span> <span tapmode onclick="zhaohui()">忘记密码</span>
+				</div>
+			</div>
+  </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript">
+      apiready = function(){
+        //fnLogin();
+      };
+      function fnLogin() {
+        var username=$api.byId("username").value;
+        var password=$api.byId('password').value;
+        if(isNull(username)){
+          mytoast("请输入用户名","middle");
+          return false;
+        }
+        if(isNull(password)){
+          mytoast("请输入密码","middle");
+          return false;
+        }
+        var btn=$api.byId('login');
+        btn.disabled=true;
+        btn.innerText="正在提交，请稍候..."
+        api.parseTapmode();
+        getAjax('/login',{"name": username, "password": password},function(res){
+
+          if (res.code == "0") {
+            if(res.data.question==1){//如果设置了安全问题则关闭窗口,否则打开安全问题这只页面
+              $api.setStorage('hyid', res.data.ID);
+              $api.setStorage('accessToken',res.data.TOKEN);
+              $api.setStorage('isQustion', res.data.question);//是否设置了安全问题
+              //$api.setStorage('userinfo', JSON.stringify(res.data));
+              mytoast("登录成功","middle");
+              api.sendEvent({
+                  name: 'setuserinfo'
+              });
+              api.closeWin();
+            }else{
+              btn.disabled = false;
+              btn.innerText = "登录";
+               $api.setStorage('zcid', res.data.ID);//记录用户ID为正在注册ID
+                api.openWin({
+                    name: 'mibao',
+                    url: 'mibao.html',
+                    pageParam: {}
+                });
+            }
+          }else{
+            btn.disabled = false;
+            btn.innerText = "登录";
+            mytoast(res.msg,"middle");
+          }
+        })
+      }
+
+      function zhaohui(){
+        api.openWin({
+             name: 'zhaohui',
+             url: 'zhaohui.html',
+             pageParam: {}
+         });
+      }
+      function register(){
+       api.openWin({
+            name: 'register',
+            url: 'register.html',
+            pageParam: {}
+        });
+      }
+  </script>
+  </html>

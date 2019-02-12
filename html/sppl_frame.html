@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <meta name="format-detection" content="telephone=no,email=no,date=no,address=no"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/iconfont.css" />
+      <style>
+          body{
+
+          }
+/*评论部分样式*/
+ .comment-box{margin:15px 3%;padding-top:5px;border-top:1px solid #EFEFEF;}
+ .comment-box .c-title{font-size:16px;color:#333;}
+ .comment-box .comment-item{margin-top:15px;border-bottom:1px solid #EFEFEF;padding-bottom:10px;}
+ .comment-box .comment-item:last-child{border-bottom:0px;}
+ .comment-box .comment-item .hd{
+   display: -webkit-box;
+ display: -webkit-flex;
+ display: flex;
+ justify-content:space-between;
+ -webkit-box-pack:justify;
+ -moz-justify-content:space-between;
+ -webkit-justify-content: space-between;
+ align-items:center;
+ -webkit-align-items:center;
+ box-align:center;
+ -moz-box-align:center;
+ -webkit-box-align:center;}
+ .comment-box .comment-item .hd .u-info{
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: flex;
+   height:50px;
+   width:65%;
+ }
+ .comment-box .comment-item .hd .u-info .headpic{
+   width:25%;
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: flex;
+   align-items:center;
+   -webkit-align-items:center;
+   box-align:center;
+   -moz-box-align:center;
+   -webkit-box-align:center;
+ }
+ .comment-box .comment-item .hd .u-info .headpic img{width:50px; height:50px;border-radius: 50%;overflow: hidden;}
+ .comment-box .comment-item .hd .u-info .nicheng .name{margin-top:5px;color:#57B2F8;font-size:15px;}
+ .comment-box .comment-item .hd .u-info .nicheng .time{color:#bbb;font-size: 13px;}
+ .star{width:35%;text-align:right;}
+ .star .iconfont{font-size:20px;color:#8A8A8A;}
+ .star .pf{color:#FFD00E;}
+ .comment-box .comment-item .bd{font-size:13px;color:#333;margin-top:10px;}
+  .comment-item{padding:0 2%;}
+      </style>
+  </head>
+  <body>
+    <div class="aui-content aui-margin-b-15">
+      <div class="comment-box" style="border-top:0px;">
+        <div class="c-title">全部评论<span onclick="fnxiepinglun()" style="float:right;color:#57B4F7;">写评论</span></div>
+          <div class="comment-item" v-for="(item,index) of listData" :key="index">
+               <div class="hd">
+                 <div class="u-info">
+                     <div class="headpic"><img :src="siteUrl+item.CM_HEADIMG"/></div>
+                     <div class="nicheng"><div class="name">{{item.CM_USERNAME}}</div><div class="time">{{item.GMT_CREATE}}</div></div>
+                 </div>
+                 <div class="star" v-if="item.CM_STAR==1">
+                    <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i></div>
+                 <div class="star" v-else-if="item.CM_STAR==2">
+                    <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i></div>
+                 <div class="star" v-else-if="item.CM_STAR==3">
+                    <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i></div>
+                  <div class="star" v-else-if="item.CM_STAR==4">
+                    <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang"></i></div>
+                 <div class="star" v-else-if="item.CM_STAR==5">
+                    <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i></div>
+               </div>
+               <div class="bd">
+                   <span>{{item.CM_CONTENT}}</span>
+               </div>
+           </div>
+           <div v-if="jlNum==0" style="text-align:center;margin-top:50px;font-size:15px;color:#666;">暂无评论！</div>
+       </div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+  var datas={
+        sp_id: 0,//视频ID
+        listData:[],
+        siteUrl:'',
+        jlNum:0,
+        stars: 1,//星星评分
+        pagesize: 10,
+        pageindex: 0,
+  }
+  new Vue({
+    el: '.aui-content',
+    data: datas
+  })
+    apiready = function(){
+        datas.sp_id=api.pageParam.spid;//获取ID
+        datas.siteUrl=siteAdd;
+        fnDataList();
+        fnInitEvent();//监听事件广播
+        initPullRefresh();
+        scrolltobottom();//上拉加载更多
+    };
+
+    function fnInitEvent() {
+        api.addEventListener({
+            name: 'sppl_success'
+        }, function(ret, err) {
+            fnDataList();
+        })
+    };
+    function fnxiepinglun(){
+      var hyid = $api.getStorage('hyid');
+      if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+        api.openFrame({
+    		    name: 'xiepinglun_sp',
+    		    url: 'xiepinglun_sp.html',
+    		    bounces:false,
+    		    rect:{
+    				x:0,
+    				y:0,
+    				w:'auto',
+    				h:'auto'
+    			},pageParam:{
+            spid:datas.sp_id
+          }
+    	  });
+      }else {
+        mytoast("您还没有登录，登录后才能评论！","middle");
+      }
+    }
+    function fnDataList(){
+      var spid=datas.sp_id;
+      var pgsize = datas.pagesize;
+      var pgidx = 0;//当前页
+      datas.pageindex = 0;//重置为0
+      if ( typeof(spid) != undefined && typeof(spid) != 'undefined' && spid != null) {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中...',
+            text: '',
+            modal: true
+        });
+        getAjax('/commentlist',{id: spid, pagesize: pgsize, pageindex: pgidx, type:1},function(res){
+          api.refreshHeaderLoadDone();
+            if(res.code==0){
+              api.hideProgress();
+              datas.listData=res.data;
+              if(res.data.length>0){
+                datas.jlNum=res.data.length
+              }
+            }else {
+              api.hideProgress();
+              mytoast(res.msg,"middle")
+            }
+        })
+      }else {
+        mytoast("未获取到视频ID","middle")
+        setTimeout(function(){
+          api.closeWin();
+        },1500)
+      }
+    }
+    function initPullRefresh() {
+      api.setRefreshHeaderInfo({
+                loadingImg: 'widget://image/refresh.png',
+                bgColor: '#ccc',
+                textColor: '#fff',
+                textDown: '下拉刷新...',
+                textUp: '松开刷新...'
+            }, function(ret, err) {
+              fnDataList();
+            });
+        };
+    //上拉加载更多
+    function scrolltobottom() {
+      api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+              threshold: 50 //距离底部距离
+          }
+      }, function(ret, err) {
+          getmore();
+      });
+  }
+  function getmore(){
+    var pgsize =datas.pagesize;
+    var pgidx =datas.pageindex + 1;//当前页
+      datas.pageindex = pgidx;
+      var spid=datas.sp_id;
+      if ( typeof(spid) != undefined && typeof(spid) != 'undefined' && spid != null) {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中...',
+            text: '请稍候...',
+            modal: true
+          });
+          getAjax('/commentlist',{id: spid, pagesize: pgsize, pageindex: pgidx, type: 1 },function(res){
+            if (res.code==0) {
+              if(res.data.length>0){
+                 var data = datas.listData;
+                    data = data.concat(res.data)
+                    datas.listData = data;
+                 api.hideProgress();
+              }else{
+                api.hideProgress();
+                mytoast("没有更多数据了","middle");
+              }
+           }else{
+             api.hideProgress();
+             mytoast(res.msg,"middle")
+           }
+          })
+      }
+  }
+  </script>
+  </html>

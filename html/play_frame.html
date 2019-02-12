@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <meta name="format-detection" content="telephone=no,email=no,date=no,address=no"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/iconfont.css" />
+      <style>
+            body{
+              background:#fff;
+            }
+          .video{background:#fff;}
+          .h200{height:200px;}
+          .h250{height:250px;}
+           .video-info-box{margin:10px 3%;color:#A0A0A0;font-size:15px;position:relative;}
+           .video-info-box .v-title{font-size:18px;color:#000;}
+           .video-info-box .v-type{
+             display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            justify-content:space-between;
+            -webkit-box-pack:justify;
+            -moz-justify-content:space-between;
+            -webkit-justify-content: space-between;
+            margin-top:5px;}
+           .video-info-box .v-summary{margin-top:5px;height:40px;overflow:hidden;}
+           .sum-btn{width:100%;color:#333;font-size:15px;text-align:center;padding:5px;}
+           .zhankai{display:block;}
+           .shouqi{display:none;}
+          .shouqi{width:100%;color:#333;font-size:15px;text-align:center;padding:5px;display:none;}
+          .share-box{
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            justify-content:space-between;
+            -webkit-box-pack:justify;
+            -moz-justify-content:space-between;
+            -webkit-justify-content: space-between;
+            align-items:center;
+            -webkit-align-items:center;
+            box-align:center;
+            -moz-box-align:center;
+            -webkit-box-align:center;
+            margin:10px 3%;
+            margin-top:15px;
+            padding-bottom:5px;
+            border-bottom:1px solid #EFEFEF;
+          }
+           .share-box .iconfont{
+             font-size:22px;
+           }
+           .share-box .s_cm{
+               font-size:15px;
+               display: -webkit-box;
+               display: -webkit-flex;
+               display: flex;
+               align-items:center;
+               -webkit-align-items:center;
+               box-align:center;
+               -moz-box-align:center;
+               -webkit-box-align:center;
+               color:#03A9F4;
+            }
+           .share-box .s_share{
+             color:#414141
+           }
+           .list{
+             display: -webkit-box;
+             display: -webkit-flex;
+             display: flex;
+             justify-content:space-between;
+             -webkit-box-pack:justify;
+             -moz-justify-content:space-between;
+             -webkit-justify-content: space-between;
+             -webkit-flex-wrap:wrap;
+             -webkit-box-lines:multiple;
+             -moz-flex-wrap:wrap;
+             flex-wrap:wrap;
+           }
+           /*推荐部分样式*/
+          .red-box{margin:10px 0px;}
+          .red-box .r-title{font-size:16px;color:#333;margin:0 3%;}
+          .red-box .item{width:49%;margin-top:15px;overflow: hidden;}
+          .red-box .item .img{width:100%; height:125px}
+          .red-box .item .bd{
+                   margin-top:5px;
+                   padding:0 5px;
+                   display: -webkit-box;
+                   display: -webkit-flex;
+                   display: flex;
+                   justify-content:space-between;
+                   -webkit-box-pack:justify;
+                   -moz-justify-content:space-between;
+                   -webkit-justify-content: space-between;
+                   align-items:center;
+                   -webkit-align-items:center;
+                   box-align:center;
+                   -moz-box-align:center;
+                   -webkit-box-align:center;
+            }
+          .red-box .item .titles{width:100%; color:#333;font-size: 14px;overflow: hidden; /*自动隐藏文字*/text-overflow: ellipsis;/*文字隐藏后添加省略号*/white-space: nowrap;/*强制不换行*/}
+          /*评论部分样式*/
+           .comment-box{margin:15px 3%;padding-top:5px;border-top:1px solid #EFEFEF;}
+           .comment-box .c-title{font-size:16px;color:#333;}
+           .comment-box .comment-item{margin-top:15px;border-bottom:1px solid #EFEFEF;padding-bottom:10px;}
+           .comment-box .comment-item:last-child{border-bottom:0px;}
+           .comment-box .comment-item .hd{
+             display: -webkit-box;
+           display: -webkit-flex;
+           display: flex;
+           justify-content:space-between;
+           -webkit-box-pack:justify;
+           -moz-justify-content:space-between;
+           -webkit-justify-content: space-between;
+           align-items:center;
+           -webkit-align-items:center;
+           box-align:center;
+           -moz-box-align:center;
+           -webkit-box-align:center;}
+           .comment-box .comment-item .hd .u-info{
+             display: -webkit-box;
+             display: -webkit-flex;
+             display: flex;
+             height:50px;
+             width:65%;
+           }
+           .comment-box .comment-item .hd .u-info .headpic{
+             width:25%;
+             display: -webkit-box;
+             display: -webkit-flex;
+             display: flex;
+             align-items:center;
+             -webkit-align-items:center;
+             box-align:center;
+             -moz-box-align:center;
+             -webkit-box-align:center;
+           }
+           .comment-box .comment-item .hd .u-info .headpic img{width:50px; height:50px;border-radius: 50%;overflow: hidden;}
+           .comment-box .comment-item .hd .u-info .nicheng .name{margin-top:5px;color:#57B2F8;font-size:15px;}
+           .comment-box .comment-item .hd .u-info .nicheng .time{color:#bbb;font-size: 13px;}
+           .star{width:35%;text-align:right;}
+           .star .iconfont{font-size:20px;color:#8A8A8A;}
+           .star .pf{color:#FFD00E;}
+           .comment-box .comment-item .bd{font-size:13px;color:#333;margin-top:10px;}
+            .comment-item{padding:0 2%;}
+       </style>
+  </head>
+  <body>
+       <div class="aui-content aui-margin-b-15">
+         <div id="topVideo" class="video h250"></div>
+          <div class="video-info-box">
+            <div class="v-title">{{videoInfo.MV_NAME}}</div>
+            <div class="v-type"><div>{{videoInfo.MV_CATEGORY}}</div><div>简介</div></div>
+            <div id="v-summary" class="v-summary">
+                {{videoInfo.MV_CONTENT}}
+            </div>
+            <div id="zhankai" class="sum-btn zhankai" tapmode onclick="fnzhankai()">展开全文</div>
+            <div id="shouqi" class="sum-btn shouqi" tapmode onclick="fnshouqi()">收起</div>
+          </div>
+          <div class="share-box">
+              <div class="s_cm" tapmode onclick="fnpl()"><div class="iconfont icon-yuanfucengpinglun"></div>{{comment}}热评</div>
+              <div class="s_share"><span class="iconfont icon-shoucang" v-if="isShoucang==0" tapmode onclick="fnshoucang()"></span><span class="iconfont icon-wodeshoucang" v-else style="color:#FFD00E;" tapmode onclick="fnshoucang()"></span><span class="iconfont icon-fenxiang2" style="margin-left:10px;" tapmode onclick="fnfenxiang()"></span></div>
+          </div>
+          <!--推荐-->
+          <div class="red-box">
+              <div class="r-title">相关推荐</div>
+              <div class="list">
+                   <div class="item" v-for="(item,index) of tuijian" :key="index" :data-id="item.ID"  tapmode onclick="vm.fnplay()">
+                        <img :src="item.MV_PHOTO_URL" class="img"/>
+                        <div class="bd"><span class="titles">{{item.MV_NAME}}</span></div>
+                    </div>
+               </div>
+          </div>
+          <div class="comment-box">
+          <div class="c-title">全部评论({{comment}})<span tapmode onclick="fnxiepinglun()" style="float:right;color:#57B4F7;">写评论</span></div>
+          <div class="comment-item" v-for="(item,index) of commentList" :key="index">
+              <div class="hd">
+                <div class="u-info">
+                    <div class="headpic"><img :src="siteUrl+item.CM_HEADIMG"/></div>
+                    <div class="nicheng"><div class="name">{{item.CM_USERNAME}}</div><div class="time">{{item.GMT_CREATE}}</div></div>
+                </div>
+                <div class="star" v-if="item.CM_STAR==1">
+                   <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i></div>
+                <div class="star" v-else-if="item.CM_STAR==2">
+                   <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i></div>
+                <div class="star" v-else-if="item.CM_STAR==3">
+                   <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang"></i><i class="iconfont icon-wodeshoucang"></i></div>
+                 <div class="star" v-else-if="item.CM_STAR==4">
+                   <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang"></i></div>
+                <div class="star" v-else-if="item.CM_STAR==5">
+                   <i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i><i class="iconfont icon-wodeshoucang pf"></i></div>
+              </div>
+              <div class="bd">
+                  <span>{{item.CM_CONTENT}}</span>
+              </div>
+            </div>
+            <div v-if="comment>=10" style="margin-top:5px;text-align:center;font-size:15px;color:#57B4F8;" tapmode onclick="fnpl()">查看全部</div>
+            <div v-else-if="comment==0" style="margin-top:15px;text-align:center;font-size:15px;color:#57B4F8;">暂无评论!</div>
+         </div>
+      </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+  var datas={
+          ips:'',
+          isShikan:0,//是否试看
+          sp_id: 0,//视频ID
+          isShikan:0,//是否试看
+          isShoucang:0,//是否收藏
+          siteUrl: "",//站点地址
+          videoInfo: '',//视频信息
+          comment: 0,//评论总数
+          commentList:'',//评论列表
+          tuijian: '',//相关推荐
+          top:60,//播放器距离顶部位置,用于显示提示信息
+  }
+var vm=new Vue({
+    el: '.aui-content',
+    data: datas,
+    methods:{
+        fnplay:function(){
+          var target = $api.closest(event.target, '.item');
+          var ids=$api.attr(target, 'data-id');
+          datas.sp_id=ids;
+
+          fnData();
+          api.pageUp({
+           top:true
+          });
+        }
+      },
+    updated:function(){
+      api.parseTapmode();
+    }
+  })
+    var moviePlayer;
+    apiready = function(){
+      api.parseTapmode();
+       moviePlayer = api.require('moviePlayer');
+        datas.sp_id=api.pageParam.spid;//获取视频ID
+        datas.siteUrl=siteAdd;
+        api.parseTapmode();
+        fnInitEvent();//监听事件广播
+        fnData();//加载视频数据
+
+    };
+
+    function fnmPlay(){
+      var urls=datas.videoInfo.url;
+      var header=60;
+          header=$api.getStorage('headerHeight');
+//console.log(header);
+      moviePlayer.open({
+        rect:{
+        x: 0,
+        y:header,
+        w:api.frameWidth,
+        h:250
+        },
+        styles:{
+          head:{//（可选项）JSON对象；播放器顶部导航条样式
+             bg: 'rgba(0,0,0,0.3)', //（可选项）字符串类型；顶部导航条背景，支持#、rgb、rgba、img；默认：rgba(161,161,161,0.5)
+             height: 44,                  //（可选项）数字类型；顶部导航条的高；默认：44
+             y:20,
+             backSize:30,                //（可选项）数字类型；顶部返回按钮大小；默认：44
+             backImg:'widget://image/back.png', //（可选项）字符串类型；顶部返回按钮的背景图片，要求本地路径（widget://、fs://）；默认：返回小箭头图标
+        },
+        foot:{
+            bg: 'rgba(0,0,0,0.5)',
+            height: 45,
+            palyBtn:{
+              size: 25,
+              playImg:'widget://image/play.png',
+              pauseImg:'widget://image/pause.png',
+              marginLeft:10
+            },
+            currentTimeLabel:{
+              textSize:14,
+              textColor:"#FFF",
+              textWidth: 43,
+              marginLeft:5
+            },
+            seekBar:{
+              sliderImg:'widget://image/slide.png',
+              sliderW : 20,
+              sliderH : 20,
+              progressColor: '#696969',
+              progressSelected: '#76EE00',
+              marginLeft:10,
+              marginRight:10
+            },
+            totalTimeLabel:{
+              textSize:14,
+              textColor:"#FFF",
+              textWidth: 43,
+              marginRight:5
+            },
+            fullscreenBtn:{
+              size:25,
+              verticalImg:'widget://image/fullscreen.png',
+              horizontalImg:'widget://image/unfullscreen.png',
+            }
+          }
+      },
+      path:urls,
+      autoPlay: true,
+      showBack:false,//竖屏时是否显示返回按钮
+      coverImg:'widget://image/coverImg.png',
+      isShowStatusBar:false,
+    },function(ret, err){
+      //console.log(JSON.stringify(ret));
+      });
+    }
+
+    //监听新评论，如果新添加了评论则更新
+    function fnInitEvent() {
+       api.addEventListener({
+            name: 'sppl_success'
+        }, function(ret, err) {
+          var sid=datas.sp_id;
+          //获取评论列表
+         getAjax('/commentlist',{id:sid, pagesize:10, pageindex: 0, type: 1 },function(r){
+               if(r.code==0){
+                 datas.commentList = r.data;
+                 datas.comment++;
+               }
+           })
+        })
+    };
+    //写评论点击时
+    function fnxiepinglun(){
+      var hyid = $api.getStorage('hyid');
+      if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+        api.openFrame({
+            name: 'xiepinglun_sp',
+            url: 'xiepinglun_sp.html',
+            bounces:false,
+            rect:{
+            x:0,
+            y:0,
+            w:'auto',
+            h:'auto'
+          },pageParam:{
+            spid:datas.sp_id
+          }
+        });
+      }else {
+        mytoast("您还没有登录，登录后才能评论！","middle");
+      }
+    }
+
+      //展开更多简介
+      function fnzhankai(){
+        $api.css($api.byId("zhankai"),'display:none');
+        $api.css($api.byId("shouqi"),'display:block');
+        $api.css($api.byId("v-summary"),'height:100px;overflow:scroll');
+      }
+      //收起更多简介
+      function fnshouqi(){
+        $api.css($api.byId("zhankai"),'display:block');
+        $api.css($api.byId("shouqi"),'display:none');
+        $api.css($api.byId("v-summary"),'height:40px;overflow:hidden');
+      }
+
+      function fnData(){
+        var spid=datas.sp_id;
+
+        if ( typeof(spid) != undefined && typeof(spid) != 'undefined' && spid != null) {
+            var hyid = $api.getStorage('hyid');
+            var token =$api.getStorage('accessToken');
+            if ( typeof(hyid) == undefined && typeof(hyid) == 'undefined' && hyid == null&&hyid=='') {
+              hyid = 0;
+              token = 0;
+            }
+            var cn=$api.getStorage('cn');
+            if ( typeof(cn) == undefined && typeof(cn) == 'undefined' && cn == null) {
+              cn=1;
+              var ips=$api.getStorage('ips');
+              getAjax('/ipaddress',{ip:ips},function(r){
+                  if(r.code==0){
+                    $api.setStorage('cn',r.data);
+                  }
+                })
+            }
+            api.showProgress({
+                style: 'default',
+                animationType: 'fade',
+                title: '加载中...',
+                text: '请稍候...',
+                modal: true
+            });
+            getAjax('/moviedec',{id: spid, uid: hyid, token: token,cn:cn},function(res){
+              //console.log(JSON.stringify(res));
+               if(res.code==0){
+                 datas.isShikan = res.data.movie.shikan;
+                 var name=res.data.movie.MV_NAME;
+                  $api.setStorage('playtitle',name);
+
+                 if(res.data.movie.shikan==1){
+                   api.execScript({
+                       script: 'showTips();'
+                   });
+                   //datas.top=60;
+                   //$api.removeCls($api.byId('topVideo'), 'h250');
+                   //$api.addCls($api.byId('topVideo'), 'h250');
+                   if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null&&hyid!='') {
+                     api.execScript({
+                         script: 'shikantxt(0);'
+                     });
+                   }else {
+                     api.execScript({
+                         script: 'shikantxt(1);'
+                     });
+                   }
+                 }else {
+                   //datas.top=0;
+                   //$api.removeCls($api.byId('topVideo'), 'h250');
+                   //$api.addCls($api.byId('topVideo'), 'h250');
+                   api.execScript({
+                       script: 'hideTips();'
+                   });
+                 }
+                 datas.videoInfo = res.data.movie;//获取视频信息
+                 datas.tuijian = res.data.tuijian;//获取推荐
+                 datas.isShoucang = res.data.shoucang;
+                 datas.comment = res.data.comment;//获取评论数量
+                 moviePlayer.close();
+                  //fnplay();// 调用播放
+                  fnmPlay();
+                 //获取评论列表
+                  getAjax('/commentlist',{id: spid, pagesize:10, pageindex: 0, type: 1 },function(r){
+                      if(r.code==0){
+                        api.hideProgress();
+                        datas.commentList = r.data;
+                      }else {
+                        api.hideProgress();
+                        //mytoast(res.msg,"middle");
+                      }
+                  })
+               }else if(res.code==3){
+                 api.hideProgress();
+                 api.confirm({
+                     title: '提示',
+                     msg: '此为试看地址，如需观看完整内容请充值!',
+                     buttons: ['否', '充值']
+                 }, function(ret, err){
+                    if(ret.buttonIndex==1){
+                      //moviePlayer.close();
+                      //api.closeWin();
+                      datas.isShikan = res.data.movie.shikan;
+                      var name=res.data.movie.MV_NAME;
+                       $api.setStorage('playtitle',name);
+                      if(res.data.movie.shikan==1){
+                        //datas.top=60;
+                        //$api.removeCls($api.byId('topVideo'), 'h200');
+                        //$api.addCls($api.byId('topVideo'), 'h250');
+                        api.execScript({
+                            script: 'showTips();'
+                        });
+                        if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null&&hyid!='') {
+                          api.execScript({
+                              script: 'shikantxt(0);'
+                          });
+                        }else {
+                          api.execScript({
+                              script: 'shikantxt(1);'
+                          });
+                        }
+                      }else {
+                      //  datas.top=0;
+                        //$api.removeCls($api.byId('topVideo'), 'h250');
+                        //$api.addCls($api.byId('topVideo'), 'h200');
+                        api.execScript({
+                            script: 'hideTips();'
+                        });
+                      }
+                      datas.videoInfo = res.data.movie;//获取视频信息
+                      datas.tuijian = res.data.tuijian;//获取推荐
+                      datas.isShoucang = res.data.shoucang;
+                      datas.comment = res.data.comment;//获取评论数量
+                      moviePlayer.close();
+                       //fnplay();// 调用播放
+                       fnmPlay();
+                      //获取评论列表
+                       getAjax('/commentlist',{id: spid, pagesize:10, pageindex: 0, type: 1 },function(r){
+                           if(r.code==0){
+                             api.hideProgress();
+                             datas.commentList = r.data;
+                           }else {
+                             api.hideProgress();
+                             //mytoast(res.msg,"middle");
+                           }
+                       })
+                    }else {
+                      api.openWin({
+                          name: 'goumai',
+                          url: 'goumai.html'
+                      });
+                      api.closeWin();
+                    }
+                 });
+               }else if(res.code==2){
+                 api.hideProgress();
+                 api.alert({
+                     title: '提示',
+                     msg: '账号在别处登录,您已被迫下线！',
+                 }, function(ret, err){
+                   $api.clearStorage();
+                   //广播退出
+                   api.sendEvent({
+                       name: 'outlogin'
+                   })
+                   api.closeWin();
+
+                 })
+               }
+               else {
+                 api.hideProgress();
+                 mytoast(res.msg,"middle");
+                 setTimeout(function(){
+                   api.closeWin();
+                 },1500)
+               }
+             })
+        }else {
+          mytoast("获取视频信息出错!","middle");
+          setTimeout(function(){
+            api.closeWin();
+          },1500)
+        }
+      }
+      //收藏
+      function fnshoucang(){
+        mytoast("正在操作","middle");
+        var spid=datas.sp_id;
+        var hyid = $api.getStorage('hyid');
+        var token =$api.getStorage('accessToken');
+        if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+          if ( typeof(spid) != undefined && typeof(spid) != 'undefined' && spid != null) {
+             getAjax('/shoucang',{uid:hyid,token:token,id:spid,type:1},function(res){
+               if(res.code==0){
+                 datas.isShoucang=res.data.shoucang;
+                 mytoast(res.msg,"middle");
+               }else if(res.code==2){
+                 api.alert({
+                     title: '提示',
+                     msg: '账号在别处登录,您已被迫下线！',
+                 }, function(ret, err){
+                   $api.clearStorage();
+                   //广播退出
+                   api.sendEvent({
+                       name: 'outlogin'
+                   })
+                 })
+               }else {
+                  mytoast(res.msg,"middle");
+               }
+             })
+          }else {
+            mytoast("未获取到视频ID","middle");
+          }
+        }else {
+          mytoast("您还未登录！","middle");
+        }
+      }
+      //分享
+     function fnfenxiang(){
+        var clipBoard = api.require('clipBoard');
+        var hyid = $api.getStorage('hyid');
+        var url=siteAdd+"shipin_show.html?id="+datas.sp_id
+        if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+          url=siteAdd+"shipin_show.html?id="+datas.sp_id+"&pid="+hyid;
+        }
+         api.actionSheet({
+             buttons: ['复制链接']
+         }, function(ret, err){
+             if( ret ){
+                if(ret.buttonIndex==1){
+                  clipBoard.set({
+                      value:url
+                  }, function(ret, err) {
+                      if (ret) {
+                        mytoast("复制成功","middle");
+                      }
+                  });
+                }
+             }
+         });
+     }
+      //评论
+      function fnpl(){
+        var id=datas.sp_id;
+        api.openWin({
+            name: 'sppl',
+            url: 'sppl.html',
+            pageParam: {
+                spid:id
+            }
+        });
+      }
+  </script>
+  </html>

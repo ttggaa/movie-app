@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+        .aui-content{margin-top:10px;padding:0 2%;}
+        .list-item{
+          display: -webkit-box;
+          display: -webkit-flex;
+          display: flex;
+          width:100%;
+          height:50px;
+          line-height: 50px;
+          font-size:15px;
+          color:#333;
+          border-bottom:1px solid #E4E3F3;}
+        .list-item .time{font-size:13px;color:#B5B5B5;width:50%;text-align:left;}
+        .list-item .tc{width:30%;text-align: center;}
+        .list-item .price{font-size:13px;color:#FFBC00;width:20%;text-align:right;}
+      </style>
+  </head>
+  <body>
+      <div class="aui-content aui-margin-b-15">
+          <div class="list-item" v-for="(item,index) of listData" :key="index">
+              <div class="time">{{item.GMT_CREATE}}</div>
+              <div class="tc">{{item.SH_NAME}}</div>
+              <div class="price">{{item.SH_PAY}}元</div>
+          </div>
+          <div v-if="gmNum==0" style="text-align:center;margin-top:50px;font-size:15px;color:#666;">暂无数据！</div>
+      </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+  var datas={
+      listData:'',
+      gmNum:0
+  }
+  new Vue({
+    el: '.aui-content',
+    data: datas
+  })
+
+    apiready = function(){
+      api.parseTapmode();
+      fnDataList();
+    };
+
+    function fnDataList(){
+      var hyid = $api.getStorage('hyid');
+      var token =$api.getStorage('accessToken');
+      if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '努力加载中...',
+            text: '请稍候...',
+            modal: false
+        });
+        getAjax('/shop_buy',{uid: hyid, token: token},function(res){
+          if (res.code==0) {
+           datas.listData = res.data;
+           if(res.data.length>0){
+             datas.gmNum=res.data.length
+           }
+           api.hideProgress();
+         }else if(res.code==2){
+           api.alert({
+               title: ' ',
+               msg: '账号在别处登录,您已被迫下线！',
+           }, function(ret, err){
+             $api.clearStorage();
+             //广播退出
+             api.sendEvent({
+                 name: 'outlogin'
+             });
+               api.openWin({
+                   name: 'login',
+                   url: 'login.html',
+                   pageParam: {}
+               });
+               api.hideProgress();
+           });
+         }else{
+           api.hideProgress();
+           mytoast(res.msg,"middle")
+         }
+        })
+      }
+    }
+  </script>
+  </html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <meta name="format-detection" content="telephone=no,email=no,date=no,address=no"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+        <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+      .content{padding:10px 3%;}
+      .content .cont{width:100%;}
+      .content .kefu{margin-top:20px;font-size:15px;padding:10px 0px;border-radius:10px; background:#56B3F6;color:#fff;
+        display: -webkit-box;
+         display: -webkit-flex;
+         display: flex;
+         justify-content:space-between;
+         -webkit-box-pack:justify;
+        -moz-justify-content:space-between;
+        -webkit-justify-content: space-between;
+        align-items:center;
+        -webkit-align-items:center;
+        box-align:center;
+        -moz-box-align:center;
+        -webkit-box-align:center;}
+        .kfitem{width:50%;text-align:left;margin-left:5px; flex-direction:column;-webkit-box-orient:vertical;
+   -webkit-box-direction:normal;
+   -moz-box-orient:vertical;
+   -moz-box-direction:normal;
+   flex-direction:column;
+   -webkit-flex-direction:column;}
+      </style>
+  </head>
+  <body>
+  <div class="aui-content aui-margin-b-15">
+    <div class="content">
+       <div class="cont" v-html="content"></div>
+       <div class="kefu">
+         <div style="width:50%;text-align:right;">加微信或QQ独享优惠:</div>
+         <div class="kfitem">
+            <div v-for="(item,index) of kefuData" :key="index">
+             <span>{{item.CS_TYPE}}：{{item.CS_NUMBER}}</span>
+            </div>
+          </div>
+       </div>
+   </div>
+ </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+    var datas={
+          content: '',//内容
+          kefuData:''//客服信息
+    }
+    new Vue({
+      el: '.aui-content',
+      data: datas
+    })
+      apiready = function(){
+        api.parseTapmode();
+        fnDataList();
+      };
+    function fnDataList(){
+      api.showProgress({
+              style: 'default',
+              animationType: 'fade',
+              title: '加载中...',
+              text: '请稍候...',
+              modal: false
+      });
+      getAjax('/yindao',{type:"about"},function(res){
+        if (res.code==0) {
+         datas.content = res.data.ad.CONTENT;
+         datas.kefuData = res.data.kefu;
+         api.hideProgress();
+        }else{
+           api.hideProgress();
+           mytoast(res.msg,"middle")
+        }
+      })
+    }
+  </script>
+  </html>

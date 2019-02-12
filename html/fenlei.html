@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+      <style>
+          body{
+            background:#f8f8f8;
+          }
+          .list-item{width:38%;float:left;margin-top:20px;margin-left:8%}
+          .tit{background:#66D8FA;color:#fff;height:40px;line-height:40px;text-align:center;}
+      </style>
+  </head>
+  <body>
+    <div class="aui-content aui-margin-b-15">
+      <!--<div class="items" v-for="(item,index) in listData" :key="item.ID">
+          <div class="tit">{{item.CL_NAME}}</div>
+          <div class="i" tapmode onclick="vm.fnlist()" :data-id="item.ID" :data-t="item.CL_TYPE"><img :src="siteUrl+item.CL_PIC" class="img"/></div>
+      </div>-->
+      <div class="list" style="margin-top:10px;">
+          <div class="list-item" v-for="(item,index) in listData" :key="item.ID">
+              <div class="tit i" :data-id="item.ID" :data-tit="item.CL_NAME" :data-t="item.CL_TYPE" tapmode onclick="vm.fnlist()">{{item.CL_NAME}}</div>
+          </div>
+          </div>
+      <div v-if="jlNum==0" style="text-align:center;margin-top:50px;font-size:15px;color:#666;">暂无内容！</div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+    var datas={
+      siteUrl:'',
+      listData:[],
+      jlNum:1
+    }
+   var vm=new Vue({
+    el: '.aui-content',
+    data: datas,
+    methods:{
+      fnlist:function(){
+        var target = $api.closest(event.target, '.i');
+        var ids=$api.attr(target, 'data-id');
+        var ty=$api.attr(target, 'data-t');
+        var title=$api.attr(target,'data-tit');
+        api.openWin({
+            name: 'fenlei_list',
+            url: 'fenlei_list.html',
+            pageParam: {
+                id:ids,
+                t:ty,
+                tit:title
+            }
+        });
+      }
+    },
+    updated:function(){
+      api.parseTapmode();
+    }
+  })
+
+      apiready = function(){
+        api.parseTapmode();
+        fnDataList();
+      };
+
+    function fnDataList(){
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中...',
+            text: ' ',
+            modal: true
+        });
+      getAjax('/classall',{},function(res){
+          if (res.code==0) {
+            api.hideProgress();
+            datas.siteUrl=siteAdd;
+            datas.listData=res.data;
+            if(res.data.length>0){
+              datas.jlNum=res.data.length
+            }else {
+              datas.jlNum=0
+            }
+          }else{
+            api.hideProgress();
+            mytoast(res.msg,"middle")
+          }
+        })
+      }
+  </script>
+  </html>

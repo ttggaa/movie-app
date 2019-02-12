@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>端API</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+    <link rel="stylesheet" href="../css/iconfont.css">
+    <style>
+    html,
+      body {
+        height: 100%;
+        width: 100%;
+        background-color:#F8F8F8;
+        padding:0px;margin:0px;
+      }
+        .userinfo{background:#fff;width:100%;padding:20px 1%;text-align:center;}
+        .userinfo .headpic{width:60px;height:60px;overflow:hidden;border-radius:60%;margin:0 auto;}
+        .userinfo .headpic img{width:60px;height:60px;}
+        .nicheng,.login{font-size:15px;color:#333;margin-top:5px;}
+        .time{color:#B0B0B0;font-size:12px;margin-top:10px;}
+        .time .l{text-align: center;}
+        .time .r{float:right;width:50%;text-align: center;}
+        .aui-list .aui-list-item-media{width:auto;padding-right:10px;}
+        .iconfont{font-size:24px;}
+        .tc{
+          background:#fff;
+          margin-top:10px;
+          color:#595959;
+          font-size:15px;
+        }
+        .tc .itm{text-align:center;height:50px;line-height: 50px;}
+        .tc .iconfont{color:#68BEF7;font-size:20px;}
+        .clear{clear: both;overflow: hidden;}
+        .yanse-huang{color:#F8DD50;}
+        .yanse-lv{color:#3FD239;}
+        .yanse-cheng{color:#FD8A54;}
+        .yanse-lan{color:#5DC1F3;}
+        .outloginbox{width:100%;text-align:center;margin:10px 0px;}
+        .outlogin{border:0px;background:#56B3F6;color:#fff;height:40px;line-height: 40px;border-radius: 5px;text-align:center;width:90%;}
+    </style>
+</head>
+<body>
+  <section id="users" class="aui-content">
+     <div class="userinfo" v-if="isLogin">
+            <div class="headpic"><img :src="siteAdd+headpic"  tapmode onclick="fnOpen()"/></div>
+            <div class="nicheng">{{username}}</div>
+            <div class="time">
+              <div v-if="huiyuandata==0" class="l">会员有效期:未开通</div><div v-else class="l">会员有效期:{{huiyuandata}}</div>
+            </div>
+        </div>
+        <div class="userinfo" v-else onclick="openLogin()">
+            <div class="headpic"><img src="../image/img01.png" /></div>
+            <div class="login">登录/注册</div>
+        </div>
+        <div class="tc">
+            <div class="itm open-win" win="goumai" login="true"><span class="iconfont icon-qiandai"></span>&nbsp;套餐购买</div>
+            <div class="clear"></div>
+        </div>
+        <div style="margin-top:10px;">
+
+          <div class="aui-card-list-content">
+            <ul class="aui-list aui-media-list">
+              <li class="aui-list-item aui-list-item-middle open-win" win="shoucang" login="true">
+                    <div class="aui-media-list-item-inner">
+                        <div class="aui-list-item-media">
+                          <span class="iconfont icon-shoucang yanse-huang"></span>
+                        </div>
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            我的收藏
+                        </div>
+                    </div>
+                </li>
+              <li class="aui-list-item aui-list-item-middle open-win" win="guankanjilu" login="true">
+                    <div class="aui-media-list-item-inner">
+                        <div class="aui-list-item-media">
+                          <span class="iconfont icon-chakan yanse-lv"></span>
+                        </div>
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            观看记录
+                        </div>
+                    </div>
+                </li>
+                <li class="aui-list-item aui-list-item-middle open-win" win="goumaijilu" login="true">
+                      <div class="aui-media-list-item-inner">
+                          <div class="aui-list-item-media">
+                            <span class="iconfont icon-jilu yanse-cheng"></span>
+                          </div>
+                          <div class="aui-list-item-inner aui-list-item-arrow">
+                              购买记录
+                          </div>
+                      </div>
+                  </li>
+                  <li class="aui-list-item aui-list-item-middle open-win" win="uppass" login="true">
+                        <div class="aui-media-list-item-inner">
+                            <div class="aui-list-item-media">
+                              <span class="iconfont icon-mima yanse-huang"></span>
+                            </div>
+                            <div class="aui-list-item-inner aui-list-item-arrow">
+                                密码修改
+                            </div>
+                        </div>
+                    </li>
+                    <li class="aui-list-item aui-list-item-middle open-win" win="about">
+                          <div class="aui-media-list-item-inner">
+                              <div class="aui-list-item-media">
+                                <span class="iconfont icon-lianxikefu yanse-lan"></span>
+                              </div>
+                              <div class="aui-list-item-inner aui-list-item-arrow">
+                                  联系我们
+                              </div>
+                          </div>
+                      </li>
+                      <li class="aui-list-item aui-list-item-middle open-win" win="setting">
+                            <div class="aui-media-list-item-inner">
+                                <div class="aui-list-item-media">
+                                  <span class="aui-iconfont aui-icon-gear yanse-lan" style="font-size:24px;"></span>
+                                </div>
+                                <div class="aui-list-item-inner aui-list-item-arrow">
+                                    设置
+                                </div>
+                            </div>
+                        </li>
+          </ul>
+        </div>
+        <div class="outloginbox" v-if="isLogin">
+          <button class="outlogin" onclick="outlogin()">退出登录</button>
+        </div>
+    </div>
+  </section>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/vue.js"></script>
+<script type="text/javascript">
+  var datas={
+    isLogin: false,
+    cutimg:0,
+    siteAdd:'',
+    hyid:0,
+    username: '',
+    headpic: '',
+    huiyuandata:0,
+    amount:0,
+  }
+  new Vue({
+      el: '#users',
+      data: datas
+  })
+
+  apiready = function(){
+    fnInitEvent();//监听事件广播
+    fnUpdateUserInfo();//获取用户信息
+    fnReadyOpenWin();//打开win
+    initPullRefresh();//下拉加载
+}
+
+//下拉刷新
+function initPullRefresh() {
+  api.setRefreshHeaderInfo({
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#ccc',
+      textColor: '#fff',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...'
+    }, function(ret, err) {
+        fnUpdateUserInfo();//获取用户信息
+    });
+  };
+//打开登录页面
+function openLogin(){
+  api.openWin({
+      name:"login",
+      url: 'login.html'
+  });
+}
+//退出登录
+function outlogin(){
+  api.confirm({
+      title: '提示',
+      msg: '确定要退出吗？',
+      buttons: ['确定', '取消']
+  }, function(ret, err){
+      if(ret.buttonIndex==1){
+        //广播退出
+        api.sendEvent({
+            name: 'outlogin'
+        });
+        $api.clearStorage();//清除用户缓存
+        fnUpdateUserInfo();//更新用户信息
+        api.openWin({
+            name:"login",
+            url: 'login.html'
+        });
+      }
+  });
+}
+
+function fnInitEvent() {
+  //如果监听到userinfo，则调用fnUpdateUserInfo()获取用户信息
+    api.addEventListener({
+        name: 'setuserinfo'
+    }, function(ret, err) {
+        fnUpdateUserInfo();
+    });
+    api.addEventListener({
+        name: 'outlogin'
+    }, function(ret, err) {
+        fnUpdateUserInfo();
+    });
+};
+function fnUpdateUserInfo() {
+  var hyid = $api.getStorage('hyid');
+  if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+      api.showProgress({
+          style: 'default',
+          animationType: 'fade',
+          title: '加载中...',
+          text: '请稍候...',
+          modal: true
+      });
+      var accessToken=$api.getStorage('accessToken');
+      getAjax('/userinfo',{"uid": hyid, "token": accessToken},function(res){
+        api.refreshHeaderLoadDone();
+       if (res.code==0) {
+          datas.siteAdd=siteAdd;
+          datas.username = res.data.USERNAME;
+          datas.headpic = res.data.USERIMG;
+          datas.huiyuandata = res.data.taocan;
+          datas.amount = res.data.NO_PRICE;
+          datas.hyid = res.data.ID;
+          datas.isLogin = true;
+          api.hideProgress();
+        }else if(res.code==2){
+          api.alert({
+              title: ' ',
+              msg: '账号在别处登录,您已被迫下线！',
+          }, function(ret, err){
+            $api.clearStorage();
+            //广播退出
+            api.sendEvent({
+                name: 'outlogin'
+            });
+              api.openWin({
+                  name: 'login',
+                  url: 'login.html',
+                  pageParam: {}
+              });
+              api.hideProgress();
+          });
+
+        }else{
+          api.hideProgress();
+          mytoast(res.msg,"middle")
+        }
+      })
+    }else {
+        datas.isLogin = false;
+    }
+};
+
+  function fnOpen() {
+    api.actionSheet({
+            title: '',
+            cancelTitle: '取消',
+            buttons: ['拍照', '从手机相册选择']
+        }, function(ret, err) {
+            if (ret) {
+                getPicture(ret.buttonIndex);
+            }
+        });
+  }
+
+  function getPicture(sourceType) {
+    if (sourceType == 1) { // 拍照
+      api.getPicture({
+                sourceType: 'camera',
+                encodingType: 'png',
+                mediaValue: 'pic',
+                destinationType:'url',
+                allowEdit: false
+      },function(ret,err){
+        // 获取拍照数据并处理
+        if(ret){
+          var imgSrc=ret.data;
+          if(imgSrc!=""){
+             $api.setStorage('headimg',imgSrc);
+               api.openWin({
+                     name: 'cutimg',
+                     url: 'cutimg.html',
+                     pageParam: {}
+               });
+          }
+        }
+      })
+    }else if(sourceType==2){//从相册选择
+      api.getPicture({
+                sourceType: 'library',
+                encodingType: 'png',
+                destinationType:'url',
+                mediaValue: 'pic'
+      },function(ret,err){
+         if(ret){
+          var imgSrc=ret.data;
+          if(imgSrc!=""){
+             $api.setStorage('headimg',imgSrc);
+              api.openWin({
+                     name: 'cutimg',
+                     url: 'cutimg.html',
+                     pageParam: {}
+              });
+          }
+        }
+      })
+    }else{
+      return;
+    }
+  }
+</script>
+</html>

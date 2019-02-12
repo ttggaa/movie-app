@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/iconfont.css">
+      <style>
+      body{background:#fff;}
+      .aui-content{margin-top:10px;}
+      #topItem{padding:10px 2%;}
+      .aui-bar-btn-item.aui-active{background:none;color:#56B3F6;border-bottom:#56B3F6 1px solid;}
+      .aui-bar-btn-item{border:0px;color:#333;border-bottom:1px solid #E5E5E5;}
+      .cont-item{display:none;}
+      .cont-item-act{display:block;}
+      .tips{font-size:12px;color:#56B4F4;padding:10px;}
+      .listbox{display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;justify-content:space-between;padding:15px 5px;height:130px;position:relative;border-bottom:1px solid #f2f2f2;}
+      .listbox .imgbox{width:40%;overflow:hidden;}
+      .listbox .imgbox img{width:100%;height:100%;}
+      .listbox .infobox{width:58%;overflow:hidden;margin-left:2%;}
+      .listbox .infobox .name{font-size:15px;color:#333;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+      .listbox .infobox .status{margin-top:10px;font-size:13px;}
+      .listbox .infobox .status .vip{background:#FFC90C;color:#fff;border-radius:20px;padding:3px 10px;}
+      .listbox .infobox .status .mian{background:#56B3F6;color:#fff;border-radius:20px;padding:3px 10px;}
+      .listbox .infobox .notes{font-size:13px;color:#bbb;margin-top:8px;width:80%;max-height:60px;overflow:hidden;}
+      .listbox .infobox .del{position:absolute;right:15px;bottom:18px;}
+      .listbox .infobox .del .icon-shanchu{font-size:20px;color:#939393;}
+      </style>
+  </head>
+  <body>
+    <div class="aui-content aui-margin-b-15">
+      <div id="topItem" class="aui-bar aui-bar-btn aui-bar-btn-full">
+        <div class="aui-bar-btn-item aui-active">视频</div>
+        <div class="aui-bar-btn-item">漫画</div>
+      </div>
+      <div id="list">
+        <div id="shipin" class="cont-item cont-item-act">
+            <div class="tips">温馨提示：如果您的收藏视频减少了，那是因为视频下架了</div>
+            <div class="listbox" v-for="(item,index) of shipinData" :key="index">
+                      <div class="imgbox" :data-id="item.ID" tapmode onclick="fnhref(1)"><img :src="item.pic" /></div>
+                      <div class="infobox">
+                          <div class="name">{{item.name}}</div>
+                          <div class="status"><span class="vip" v-if="item.type==2">VIP视频</span><span class="mian" v-else>免费观看</span></div>
+                          <div class="notes">{{item.content}}</div>
+                          <div class="del"><span class="iconfont icon-shanchu" v-on:click="del(item.lookid,index,1)"></span></div>
+                      </div>
+            </div>
+            <div v-if="spNum==0" style="text-align:center;margin-top:20px;font-size:15px;color:#666;">无记录！</div>
+        </div>
+        <div id="manhua" class="cont-item">
+            <div class="tips">温馨提示：如果您的收藏漫画减少了，那是因为漫画下架了</div>
+              <div class="listbox" v-for="(item,index) of manhuaData" :key="index">
+                  <div class="imgbox" :data-id="item.ID" tapmode onclick="fnhref(2)"><img :src="item.pic" /></div>
+                  <div class="infobox">
+                      <div class="name">{{item.name}}</div>
+                      <div class="notes">{{item.content}}</div>
+                      <div class="del"><span class="iconfont icon-shanchu" v-on:click="del(item.lookid,index,2)"></span></div>
+                  </div>
+              </div>
+              <div v-if="mhNum==0" style="text-align:center;margin-top:20px;font-size:15px;color:#666;">无记录！</div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript" src="../script/aui-tab.js"></script>
+  <script type="text/javascript" src="../script/vue.js"></script>
+  <script type="text/javascript">
+    var datas={
+        topItemIndex:1,
+        hyid: 0,
+        token: 0,
+        shipinData: '',
+        manhuaData: '',
+        spNum:0,
+        mhNum:0,
+        pagesizeS: 10,
+        pageindexS: 0,
+        pagesizeM: 10,
+        pageindexM: 0,
+    }
+   new Vue({
+      el: '#list',
+      data: datas,
+      methods:{
+        del:function(ids,idx,i){
+          api.confirm({
+              title: '提示',
+              msg: '确定要删除吗？',
+              buttons: ['确定', '取消']
+          }, function(ret, err){
+            if(ret.buttonIndex==1){
+              var hyid = $api.getStorage('hyid');
+              var token =$api.getStorage('accessToken');
+                if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+                  api.showProgress({
+                      style: 'default',
+                      animationType: 'fade',
+                      title: '正在删除...',
+                      text: ' ',
+                      modal: false
+                    });
+                    getAjax('/dellook',{uid: hyid, token: token, type:1, id: ids},function(res){
+                      if (res.code==0) {
+                        api.hideProgress();
+                        mytoast("删除成功","middle");
+                        if (i == 1) {
+                         datas.shipinData.splice(idx, 1);
+                         datas.spNum--;
+                        } else {
+                         datas.manhuaData.splice(idx, 1);
+                         datas.mhNum--;
+                        }
+                       }else if(res.code==2){
+                         api.alert({
+                             title: ' ',
+                             msg: '账号在别处登录,您已被迫下线！',
+                         }, function(ret, err){
+                           $api.clearStorage();
+                           //广播退出
+                           api.sendEvent({
+                               name: 'outlogin'
+                           });
+                             api.openWin({
+                                 name: 'login',
+                                 url: 'login.html',
+                                 pageParam: {}
+                             });
+                             api.hideProgress();
+                         });
+                       } else{
+                           api.hideProgress();
+                           mytoast(res.msg,"middle")
+                         }
+                    })
+                }else{
+                  api.alert({
+                      title: ' ',
+                      msg: '账号在别处登录,您已被迫下线！',
+                  }, function(ret, err){
+                    $api.clearStorage();
+                    //广播退出
+                    api.sendEvent({
+                        name: 'outlogin'
+                    });
+                      api.openWin({
+                          name: 'login',
+                          url: 'login.html',
+                          pageParam: {}
+                      });
+                      api.hideProgress();
+                  });
+                }
+            }
+          })
+        }
+      }
+    })
+
+      apiready = function(){
+        api.parseTapmode();
+        fnDataList(1);
+        scrolltobottom();//上拉加载更多
+      };
+
+      function fnhref(i){
+        var target = $api.closest(event.target, '.imgbox');
+        var ids=$api.attr(target, 'data-id');
+        if(i==1){
+          api.openWin({
+              name: 'play',
+              url: 'play.html',
+              pageParam: {
+                  spid:ids
+              }
+          });
+        }else if(i==2){
+          api.openWin({
+              name: 'mh_list',
+              url: 'mh_list.html',
+              pageParam: {
+                  mhid:ids
+              }
+          });
+
+        }
+      }
+
+      //加载数据
+      function fnDataList(t){
+        var pgsize =0;
+        var pgidx = 0;//当前页
+
+        if(t==1){
+          pgsize=datas.pagesizeS;
+          datas.pageindexS = 0;//重置为0
+        }else if(t==2){
+          pgsize=datas.pagesizeM;
+          datas.pageindexM = 0;//重置为0
+        }
+
+        var hyid = $api.getStorage('hyid');
+        var token =$api.getStorage('accessToken');
+        if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+          datas.hyid=hyid;
+          datas.token=token;
+          api.showProgress({
+              style: 'default',
+              animationType: 'fade',
+              title: '努力加载中...',
+              text: '请稍候...',
+              modal: false
+          });
+          getAjax('/lookjilu',{uid: hyid, token: token, type:t, looktype:1, pagesize: pgsize, pageindex: pgidx },function(res){
+             if (res.code==0) {
+              if(t==1){
+                datas.shipinData = res.data;
+                if(res.data.length>0){
+                  datas.spNum=res.data.length
+                }
+              }else if(t==2){
+                datas.manhuaData=res.data;
+                if(res.data.length>0){
+                  datas.mhNum=res.data.length
+                }
+              }
+              api.hideProgress();
+            }else if(res.code==2){
+              api.alert({
+                  title: ' ',
+                  msg: '账号在别处登录,您已被迫下线！',
+              }, function(ret, err){
+                $api.clearStorage();
+                //广播退出
+                api.sendEvent({
+                    name: 'outlogin'
+                });
+                  api.openWin({
+                      name: 'login',
+                      url: 'login.html',
+                      pageParam: {}
+                  });
+                  api.hideProgress();
+              });
+            }else{
+              api.hideProgress();
+              mytoast(res.msg,"middle")
+            }
+          })
+        }
+      }
+      var tab = new auiTab({
+        element:document.getElementById("topItem"),
+        index:1,
+        repeatClick:false
+        },function(ret){
+          var item = $api.byId('list');
+          var items = $api.domAll(item, '.cont-item');
+          if(ret.index==1){
+            datas.topItemIndex=1;
+            $api.addCls(items[0], 'cont-item-act');
+            $api.removeCls(items[1], 'cont-item-act');
+            fnDataList(1);
+          }else if(ret.index==2){
+            datas.topItemIndex=2;
+            $api.addCls(items[1], 'cont-item-act');
+            $api.removeCls(items[0], 'cont-item-act');
+            fnDataList(2);
+          }
+      });
+
+      //上拉加载更多
+      function scrolltobottom() {
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 50 //距离底部距离
+            }
+        }, function(ret, err) {
+            var idx=datas.topItemIndex;
+            if(idx==1){
+              getmore(1);
+            }else if(idx==2){
+              getmore(2);
+            }
+           //console.log("加载更多");
+          //  listAjax(true);
+        });
+    }
+
+    //加载数据
+    function getmore(t){
+      var pgsize =0;
+      var pgidx = 0;//当前页
+      var hyid = datas.hyid;
+      var token = datas.token;
+      if(t==1){
+        pgsize = datas.pagesizeS;
+        pgidx = datas.pageindexS + 1;
+        datas.pageindexS = pgidx;
+      }else if(t==2){
+        pgsize = datas.pagesizeM;
+        pgidx = datas.pageindexM + 1;
+        datas.pageindexM = pgidx;
+      }
+      if ( typeof(hyid) != undefined && typeof(hyid) != 'undefined' && hyid != null) {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '努力加载中...',
+            text: '请稍候...',
+            modal: false
+        });
+        getAjax('/lookjilu',{uid: hyid, token: token, type:t, looktype:1, pagesize: pgsize, pageindex: pgidx },function(res){
+           if (res.code==0) {
+             if(res.data.length>0){
+                if(t==1){
+                  var data = datas.shipinData;
+                      data = data.concat(res.data)
+                      datas.shipinData = data;
+                }else if(t==2){
+                  var data = datas.manhuaData;
+                      data = data.concat(res.data)
+                      datas.manhuaData = data;
+                }
+                api.hideProgress();
+             }else{
+               api.hideProgress();
+               mytoast("没有更多数据了","middle");
+             }
+          }else if(res.code==2){
+            api.alert({
+                title: ' ',
+                msg: '账号在别处登录,您已被迫下线！',
+            }, function(ret, err){
+              $api.clearStorage();
+              //广播退出
+              api.sendEvent({
+                  name: 'outlogin'
+              });
+                api.openWin({
+                    name: 'login',
+                    url: 'login.html',
+                    pageParam: {}
+                });
+                api.hideProgress();
+            });
+          }else{
+            api.hideProgress();
+            mytoast(res.msg,"middle")
+          }
+        })
+      }
+    }
+  </script>
+  </html>

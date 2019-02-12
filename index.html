@@ -1,0 +1,236 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>底部导航</title>
+    <link rel="stylesheet" type="text/css" href="./css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="./css/iconfont.css" />
+    <style>
+    body{padding:0px;margin:0px;}
+    .aui-bar-nav{background:#56B3F6;}
+    .header-item {
+        display: none;
+    }
+    .header-item-act {
+        display: block;
+    }
+    .nav{background:#56B3F6;height:50px;width:100%;padding:10px 5px;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      justify-content:space-around;
+      height:50px;
+      align-items:center;
+    }
+    .nav .logo-box{width:30%;text-align: center;}
+    .nav .logo-box img{margin-top: 5px;width:100px;}
+    .nav .menu{width:60%;
+      display:flex;
+      display: -webkit-box;
+      display: -webkit-flex;
+      height:45px;
+      align-items:center;
+    }
+    .nav .menu li{width:25%;text-align:center;font-size:15px;}
+    .nav .menu li .menu-item{color:#fff;padding:5px;}
+    .nav .menu li .act{color:#fff;border-bottom:1px solid #fff;}
+    .nav .search{width:10%;display:flex;justify-content:center;}
+    .nav .search .mui-icon-search{font-size:23px;color:#fff;}
+    .icon-fenlei{font-size: 23px;}
+    </style>
+</head>
+<body>
+  <header class="aui-bar aui-bar-nav" id="aui-header">
+    <div id="home" class="header-item header-item-act">
+        <div class="nav">
+         <div class="logo-box">
+             <img src="./image/logo.png" />
+         </div>
+         <ul id="menu" class="menu">
+             <li><span tapmode class="menu-item act" onclick="fnnav(0)">精选</span></li>
+             <li><span tapmode class="menu-item" onclick="fnnav(1)">视频</span></li>
+             <li><span tapmode class="menu-item" onclick="fnnav(2)">影片</span></li>
+             <li><span tapmode class="menu-item" onclick="fnnav(3)">漫画</span></li>
+         </ul>
+         <div class="search"><span class="aui-iconfont aui-icon-search" tapmode onclick="search()"></span></div>
+       </div>
+     </div>
+     <div id="tuiguang" class="header-item">全部分类</div>
+     <div id="users" class="header-item">个人中心</div>
+  </header>
+
+    <footer class="aui-bar aui-bar-tab" id="footer">
+          <div id="tabbar1" class="aui-bar-tab-item aui-active" tapmode onclick="randomSwitchBtn(0)">
+              <i class="aui-iconfont aui-icon-home"></i>
+              <div class="aui-bar-tab-label">首页</div>
+          </div>
+          <div id="tabbar2" class="aui-bar-tab-item" tapmode onclick="randomSwitchBtn(1)">
+              <i class="iconfont icon-fenlei"></i>
+              <div class="aui-bar-tab-label">分类</div>
+          </div>
+          <div id="tabbar3" class="aui-bar-tab-item" tapmode onclick="randomSwitchBtn(2)">
+              <i class="aui-iconfont aui-icon-my"></i>
+              <div class="aui-bar-tab-label">个人中心</div>
+          </div>
+      </footer>
+</body>
+</html>
+<script type="text/javascript" src="script/api.js"></script>
+<script type="text/javascript" src="script/common.js"></script>
+<script type="text/javascript">
+  apiready = function(){
+        api.parseTapmode();
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var getips= api.require('ipAddress');//引用ipAddress模块
+        //获取IP地址：收费模块
+        getips.getIp(
+        function(ret, err) {
+          if(ret.status){
+            $api.setStorage('ips',ret.ip);
+            fngetCn(ret.ip);
+
+          }
+        });
+        fnInit();
+        fnInitListener();
+        randomSwitchBtn(0);
+    }
+    //判断是国内还是国外IP(1国内，2国外)
+    function fngetCn(ips){
+      getAjax('/ipaddress',{ip:ips},function(r){
+          if(r.code==0){
+            $api.setStorage('cn',r.data);
+          }
+        })
+    }
+
+    function fnInitListener() {
+        var flag = false;
+        api.addEventListener({
+            name: 'keyback'
+        }, function(ret, err) {
+            if (false == flag) {
+                api.toast({
+                    msg: '再按一次退出',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+                flag = true;
+                setTimeout(function() {
+                    flag = false;
+                }, 2000);
+            } else {
+                api.closeWidget({
+                    silent: true
+                });
+            }
+        });
+    };
+
+    var headers, footers, headerHeight, footerHeight;
+    function fnInit() {
+        var header = $api.byId('aui-header');
+        var footer = $api.byId('footer');
+
+        headers = $api.domAll(header, '.header-item');
+        footers = $api.domAll(footer, '.aui-bar-tab-item');
+
+        for (var i = 0; i < headers.length; i++) {
+            $api.fixIos7Bar(headers[i]);
+        }
+
+        headerHeight = $api.offset(header).h;
+        footerHeight = $api.offset(footer).h;
+        $api.setStorage('headHeight', headerHeight);
+        $api.setStorage('footHeight', footerHeight);
+    };
+
+  var frames = ['main', 'fenlei', 'usercenter'];
+    function randomSwitchBtn(index) {
+      for (var i = 0; i < headers.length; i++) {
+          if (index == i) {
+              $api.addCls(headers[i], 'header-item-act');
+              $api.addCls(footers[i], 'aui-active');
+
+              var y = 3 == index ? 0 : headerHeight;
+              api.openFrame({
+                  name: frames[i],
+                  url: './html/' + frames[i] + '.html',
+                  bounces: true,
+                  bgColor: '#f0f0f0',
+                  vScrollBarEnabled: false,
+                  hScrollBarEnabled: false,
+                  rect: {
+                      x: 0,
+                      y: y,
+                      w: 'auto',
+                      h: api.frameHeight - y - footerHeight
+                  }
+              });
+          } else {
+              $api.removeCls(headers[i], 'header-item-act');
+              $api.removeCls(footers[i], 'aui-active');
+              api.setFrameAttr({
+                  name: frames[i],
+                  hidden: true
+              });
+          }
+      }
+      if(index==0){
+        var menu = $api.byId('menu');
+        menus = $api.domAll(menu, '.menu-item');
+        for(var i=0;i<menus.length;i++){
+          if(i==index){
+            $api.addCls(menus[i], 'act');
+          }else{
+            $api.removeCls(menus[i], 'act');
+          }
+        }
+      }
+    }
+
+    var navframes=['main','shipin','yingpian','manhua'];
+    function fnnav(index){//头部切换
+      var menu = $api.byId('menu');
+      menus = $api.domAll(menu, '.menu-item');
+      for(var i=0;i<menus.length;i++){
+        if(index==i){
+          $api.addCls(menus[i], 'act');
+          api.openFrame({
+              name: navframes[i],
+              url: './html/' + navframes[i] + '.html',
+              bounces: true,
+              bgColor: '#f0f0f0',
+              vScrollBarEnabled: false,
+              hScrollBarEnabled: false,
+              rect: {
+                  x: 0,
+                  y: headerHeight,
+                  w: 'auto',
+                  h: api.frameHeight - headerHeight - footerHeight
+              }
+          });
+        }else{
+            $api.removeCls(menus[i], 'act');
+            api.setFrameAttr({
+                name: navframes[i],
+                hidden: true
+            });
+        }
+      }
+
+    }
+
+    function search(){
+      api.openWin({
+          name: 'search',
+          url: './html/search.html',
+          pageParam: {}
+      });
+
+    }
+</script>

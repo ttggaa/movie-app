@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+      <title>title</title>
+      <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+      <link rel="stylesheet" type="text/css" href="../css/aui.css"/>
+      <style>
+        .aui-content{margin-top:10px;}
+      </style>
+  </head>
+  <body>
+      <div class="aui-content aui-margin-b-15">
+        <ul class="aui-list aui-list-in">
+             <!--<li class="aui-list-item aui-list-item-middle open-win"  tapmode win="setting_image">
+                  <div class="aui-list-item-inner aui-list-item-arrow">
+                      <div class="aui-list-item-title">图片设置</div>
+              </li>-->
+            <li class="aui-list-item" onclick="fnClearCache();">
+              <div class="aui-list-item-inner">
+                <div class="aui-list-item-title">清除缓存</div>
+                <div class="aui-list-item-right" id="cacheSize"></div>
+              </div>
+            </li>
+          </ul>
+      </div>
+  </body>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/common.js"></script>
+  <script type="text/javascript">
+    apiready = function() {
+      fnReadyOpenWin();
+
+      fnGetCacheSize();
+    };
+    function fnClearCache() {
+        api.showProgress({
+            title: '清除中',
+            modal: true
+        });
+        api.clearCache(function() {
+            setTimeout(function() {
+                fnGetCacheSize();
+            }, 1000);
+        });
+    };
+    function fnGetCacheSize() {
+        api.getCacheSize(function(ret, err) {
+            api.hideProgress();
+            var size = parseInt(ret.size / 1024 / 1024 * 100) / 100;
+            var cacheSize=$api.byId('cacheSize');
+            //console.log(size);
+            if(size<0.5){
+              cacheSize.innerHTML = 0+'&nbsp;MB';
+            }else{
+              cacheSize.innerHTML = size+'&nbsp;MB';
+            }
+
+        });
+    };
+  </script>
+  </html>
